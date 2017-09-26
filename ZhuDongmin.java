@@ -5,7 +5,7 @@ public class ZhuDongmin {
 	private static String restOfLastData;				// 两条数据解析成一条新数据后，还剩余的数据
 	private static boolean hasFinishedParseData;
 	private static boolean isFirstTimeToParse = true;	// 是否解析第一条数据
-	private static int lackLength;
+	private static String addressCode;
 
 	public static void main(String[] args) {
 		String str1 = "S2160041401B170000E803E803FFFF000000000000000062";	// 末尾16个0 ， 20个数字
@@ -18,24 +18,31 @@ public class ZhuDongmin {
 		
 		String str8 = "A30CF4A3FEF47FFEF3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 		
-		System.out.println(str8.length());
+		String str9  = "S20D00C1A0A30CF4A3FEF47FFEF3E9";
+		String str10 = "S22400C1CCB7A50CB7A40CD90FA70CD90FA90CB7A30C0BA30CB3778026007DCA0D33A30CD849";
+		String str11 = "S22400C1EC0CAF0CA7A30CFEEA0BA60CB3D1206E127EBF230B6AFBD812F54B037E8F2B0BFE0A";
+		Integer valueOf = Integer.valueOf("00C1A0", 16);
+		System.out.println(toHexString(valueOf));
 //		
-//		System.out.println(calculateIntervalOfAddressCode(getAddressCode(str1),getAddressCode(str2)));
-//		System.out.println(calculateIntervalOfAddressCode(getAddressCode(str2),getAddressCode(str3)));
-//		System.out.println(calculateIntervalOfAddressCode(getAddressCode(str3),getAddressCode(str4)));
-//		System.out.println(calculateIntervalOfAddressCode(getAddressCode(str4),getAddressCode(str5)));
-//		System.out.println(calculateIntervalOfAddressCode(getAddressCode(str5),getAddressCode(str6)));
-//		System.out.println(calculateIntervalOfAddressCode(getAddressCode(str6),getAddressCode(str7)));
-		try{
-		System.out.println(parse(str1));
-		System.out.println(parse(str2));
-		System.out.println(parse(str3));
-		System.out.println(parse(str4));
-		System.out.println(parse(str5));
-		System.out.println(parse(str6));
-		}catch (Exception e){
+//		try{
+//		System.out.println(parse(str1));
+//		System.out.println(parse(str2));
+//		System.out.println(parse(str3));
+//		System.out.println(parse(str4));
+//		System.out.println(parse(str5));
+//		System.out.println(parse(str6));
+//		}catch (Exception e){
+//			e.printStackTrace();
+//		}
+		
+		try {
+			System.out.println(parse(str9));
+			System.out.println(parse(str10));
+			System.out.println(parse(str11));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	/**
@@ -108,12 +115,31 @@ public class ZhuDongmin {
 		int dataLength = getDataLength(str);
 		String data = getData(str);
 		int restOfLastDataLength = 0 ;
+		if(isFirstTimeToParse){
+			addressCode = getAddressCode(str);
+		}
+		String addressCode2 = getAddressCode(str);
+		int addressInterval = calculateIntervalOfAddressCode(addressCode, addressCode2);
+		if( addressInterval > 0x20 ){		// 如果前一个地址与后一个地址的间隔大于 0x20 
+			// 补充的 F 的个数为原来起始地址的 - 原来起始地址 & 0x00001F
+			int numOfF = Integer.valueOf(addressCode,16) - ( Integer.valueOf(addressCode,16) & 0xFFFFE0 );
+			System.out.println("numOfF : "+numOfF);
+			System.out.println("interval : "+ restOfLastData);
+			StringBuilder sBuilder = new StringBuilder(restOfLastData);
+			for(int i = 0; i < 64 - get24Data(restOfLastData).length() ; i++ ){
+				sBuilder.append("f");
+			}
+			addressCode += 0x20;
+			return sBuilder.toString();
+			
+		}
+		
 		
 		if(hasFinishedParseData || isFirstTimeToParse){	// 如果已经解析成功了一条数据
 			System.out.println("hasFinishedParseData or isFirstTimeToParse");
 			isFirstTimeToParse = false;
 			stringBuilder.append("24-").
-						  append(getAddressCode(str)).	// 这个地址你想办法弄吧，在 下面的 return 前面，如果不是 return "",地址就加 20。
+						  append(addressCode).	// 这个地址你想办法弄吧，在 下面的 return 前面，如果不是 return "",地址就加 20。
 						  append("-20-");
 			if(restOfLastData != null){			// restOfLastData 包含纯数据		
 				stringBuilder.append(restOfLastData);
@@ -133,22 +159,21 @@ public class ZhuDongmin {
 		
 		if(restOfDataLength > 0){		// 还不够 64 个数据位
 			restOfLastData = stringBuilder.append(data).toString();
-			lackLength = restOfDataLength;	// 剩余的长度
 			System.out.println("未解析完成，有数据 ： "+ restOfLastData);
 			hasFinishedParseData = false;	// 还未解析成功一条数据
 			return "未解析完成";
 		}else if(restOfDataLength == 0){	// 刚好够 64 个数据位
-			lackLength = 0;
 			restOfLastData = null;
 			hasFinishedParseData = true;	// 已经解析成功了一条数据
 			System.out.println("刚好解析完成");
+			addressCode += 0x20;		// addressCode2 已经变为了下一条地址的上一条地址
 			return stringBuilder.append(data).toString();
 		}else{							// 超出了 64 个数据位
 			String avaliableData = data.substring(0, data.length() + restOfDataLength);// 这部分数据可凑够64个
 			restOfLastData = data.substring(data.length() + restOfDataLength);			// 这部分是剩余的数据
-			lackLength = 64 + restOfDataLength;	//// 剩余的长度
 			System.out.println("data : "+data+"  avaliableData : "+avaliableData+"  restOfLastData : "+restOfLastData);
 			hasFinishedParseData = true;	// 已经解析成功了一条数据
+			addressCode += 0x20;		// addressCode2 已经变为了下一条地址的上一条地址
 			System.out.println("解析完成，并且还剩下  "+ restOfLastData);
 			return stringBuilder.append(avaliableData).toString();
 		}
@@ -228,4 +253,13 @@ public class ZhuDongmin {
 //			return stringBuilder.toString();
 //		}
 //	}
+	public static String toHexString(int i) {
+		String value = Integer.toHexString(i);
+		int length = value.length();
+		int lengthOfZero = 6 - length;
+		for( int j= 0; j < lengthOfZero; j++)
+			value = "0" + value;
+		return value;
+	}
+	
 }
