@@ -1,0 +1,31 @@
+学了很多东西，但是，却不熟，把这些，多练练
+任何东西，都浅尝辄止的话，是不会有收获的。
+1.	MVC模式
+2.	MVP模式
+3.	RxJava 和 RxAndroid
+4.	EventBus
+5.	glide
+6.	RecycleView
+7.	View的各种属性，自定义控件
+8.	shape、style、anim等
+9.	Socket
+10.	ble
+11.	pull-refresh-listView
+12.	xutil3
+13.	Material Design
+14.	MediaPlayer
+15.	okHttp
+16.	asyn-http
+17.	Rx-binding
+18.	ViewStub
+19.	percentage-layout
+20.	MPChar
+21.	项目的架构
+22.	设计模式
+23.	Handler机制
+24.	社会化分享、支付等
+25.	代码规范问题
+26.	各种常用的Util
+27.	aidl
+28.	git
+29.	动画

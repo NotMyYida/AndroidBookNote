@@ -1,0 +1,62 @@
+
+将库文件导入自己的安卓项目后，就可以使用了。
+首先在布局文件中写好PtrClassicFrameLayout，它是一个父控件，
+所有与更新数据相关的东西都要放它里面。
+ <in.srain.cube.views.ptr.PtrClassicFrameLayout
+        android:id="@+id/list_view_with_empty_view_fragment_ptr_frame"
+        xmlns:cube_ptr="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        cube_ptr:ptr_duration_to_close="200"
+        cube_ptr:ptr_duration_to_close_header="1000"
+        cube_ptr:ptr_keep_header_when_refresh="true"
+        cube_ptr:ptr_pull_to_fresh="false"
+        cube_ptr:ptr_ratio_of_header_height_to_refresh="1.2"
+        cube_ptr:ptr_resistance="1.7">
+
+//这里面放所有需要加载更新相关的控件
+
+
+</in.srain.cube.views.ptr.PtrClassicFrameLayout>
+
+相应的java代码：
+mPtrFrame = (PtrClassicFrameLayout) findViewById(R.id.list_view_with_empty_view_fragment_ptr_frame);
+		mPtrFrame.postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				mPtrFrame.autoRefresh();//自动加载，点击进页面，或者数据上下拉的时候调用
+			}
+		}, 100);
+
+//Using an object to specify the last update time.
+mPtrFrame.setLastUpdateTimeRelateObject(this);
+		mPtrFrame.setPtrHandler(new PtrHandler() {
+			@Override
+			public boolean checkCanDoRefresh(PtrFrameLayout frame,
+					View content, View header) {
+
+				// here check $mListView instead of $content
+				return PtrDefaultHandler.checkContentCanBePulledDown(
+						frame,
+						rgCountType.getCheckedRadioButtonId() == R.id.rb_step ? lvHistoryStep
+								: lvHistoryPath, header);
+			}
+
+			@Override
+			public void onRefreshBegin(PtrFrameLayout frame) {
+				//在这里加载数据，可以从数据库加载或者是网络加载
+				loadSportDataByDateNew(toMonth,
+						rgCountType.getCheckedRadioButtonId());
+			}
+		});
+
+	// the following are default settings
+		mPtrFrame.setResistance(1.7f);
+		mPtrFrame.setRatioOfHeaderHeightToRefresh(1.2f);
+		mPtrFrame.setDurationToClose(200);
+		mPtrFrame.setDurationToCloseHeader(1000);
+		// default is false
+		mPtrFrame.setPullToRefresh(false);
+		// default is true
+		mPtrFrame.setKeepHeaderWhenRefresh(true);

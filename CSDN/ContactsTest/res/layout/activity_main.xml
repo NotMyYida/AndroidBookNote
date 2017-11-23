@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity" >
+
+    <AutoCompleteTextView
+        android:id="@+id/et_auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+    
+    <TextView
+        android:id="@+id/contact_show"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:textSize="18sp"
+        android:ellipsize="marquee"
+       	android:focusableInTouchMode="true"
+       	android:focusable="true"
+        android:singleLine="true"
+       	android:marqueeRepeatLimit="marquee_forever"
+       	android:scrollHorizontally="true"
+        android:text="获取联系人人人人人人人" />
+    <!-- android:focusableInTouchMode="true"
+    android:focusable="true"
+     -->
+    <Button
+        android:id="@+id/contact_btn" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contact_show"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:text="点击获取联系人"
+        />
+    
+    <ImageView
+        android:id="@+id/iv_matrix_demo"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher"
+        android:clickable="true"
+        />
+    
+    <Button
+        android:id="@+id/btn_entry_rectf_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="进入 RectFActivity"
+        android:layout_below="@id/iv_matrix_demo"
+        />
+
+</RelativeLayout>

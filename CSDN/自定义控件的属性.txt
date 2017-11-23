@@ -1,0 +1,117 @@
+ 自定义属性数据类型简介：
+
+一、reference：参考指定Theme中资源ID。
+
+1.定义：
+	
+    <declare-styleable name="My">
+        <attr name="label" format="reference" >
+    </declare-styleable>
+
+2.使用：	
+
+    <Button   zkx:label="@string/label" >
+
+二、Color：颜色
+
+1.定义：
+	
+    <declare-styleable name="My">
+        <attr name="textColor" format="color" />
+    </declare-styleable>
+
+2.使用：
+	
+    <Button zkx:textColor="#ff0000"/>
+
+
+
+三、boolean：布尔值
+
+1.定义：
+	
+    <declare-styleable name="My">
+        <attr name="isVisible" format="boolean" />
+    </declare-styleable>
+
+2.使用：
+	
+    <Button zkx:isVisible="false"/>
+
+四、dimension：尺寸值
+ 1.定义：
+	
+    <declare-styleable name="My">
+        <attr name="myWidth" format="dimension" />
+    </declare-styleable>
+
+2.使用：
+	
+    <Button zkx:myWidth="100dip"/>
+
+五、float：浮点型
+
+1.定义：
+
+    <declare-styleable name="My">
+        <attr name="fromAlpha" format="float" />
+    </declare-styleable>
+
+2.使用：
+	
+    <alpha zkx:fromAlpha="0.3"/>
+
+
+
+六、integer：整型
+
+1.定义：
+
+    <declare-styleable name="My">
+        <attr name="frameDuration" format="integer" />
+    </declare-styleable>
+
+2.使用：
+
+    <animated-rotate zkx:frameDuration="22"/>
+
+
+
+ 七、string：字符串
+
+1.定义：
+
+    <declare-styleable name="My">
+        <attr name="Name" format="string" />
+    </declare-styleable>
+
+2.使用：
+
+    
+    <rotate zkx:Name="My name is zhang kun xiang"/>
+
+八、fraction：百分数
+
+1.定义：
+
+    <declare-styleable name="My">
+        <attr name="pivotX" format="fraction" />
+    </declare-styleable>
+
+2.使用：
+
+    <rotate zkx:pivotX="200%"/>
+
+九、enum：枚举
+
+1.定义：
+	
+    <declare-styleable name="My">
+        <attr name="language">
+            <enum name="English" value="1"/>
+        </attr>
+    </declare-styleable>
+
+2.使用：
+
+    <Button zkx:language="English"/>

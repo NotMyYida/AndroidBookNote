@@ -1,0 +1,16 @@
+public void initVisualizer(){
+
+        int audioSessionid = 0;
+
+        audioSessionid = MusicService.mPlayer.getAudioSessionId();
+
+        Log.e("audioSessionid","audioSessionid="+audioSessionid);
+        if(mVisualizer != null){
+            mVisualizer = null;
+        }
+        mVisualizer = new Visualizer(audioSessionid);
+        mVisualizer.setEnabled(false);
+        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[0]);
+        mBaseVisualizerView.setVisualizer(mVisualizer);
+        mVisualizer.setEnabled(true);
+    } 

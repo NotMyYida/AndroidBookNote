@@ -1,0 +1,110 @@
+
+首先要有字体资源，是ttf格式的文件。我们把它放在一个fonts包里面，在把fonts包放在assets里面。
+
+用枚举记录字体资源的路径和名字
+public enum CustomTypeface{
+	JIAN("fonts/microgme.ttf","JIAN"),
+	FAN("fonts/microgme.ttf","FAN"),
+	NUM("fonts/microgme.ttf","NUM");
+	private String path;
+	private String name;
+	
+	 CustomTypeface(String path ,String name){
+		this.path = path;
+		this.name = name;
+	}
+	public String getPath(){
+		return this.path;
+	}
+	
+	public String getName(){
+		return this.name;
+	}
+}
+
+获取放在assets包下的字体资源：（建议在Application的onCreate()下面使用）
+		Typeface TYPEFACE_JIAN = Typeface.createFromAsset(getAssets(),
+				CustomTypeface.JIAN.getPath());
+		Typeface TYPEFACE_NUM = Typeface.createFromAsset(getAssets(),
+				CustomTypeface.NUM.getPath());
+		Typeface TYPEFACE_FAN = Typeface.createFromAsset(getAssets(),
+				CustomTypeface.FAN.getPath());
+
+自定义属性：
+在values包下，创建一个attrs.xml，format的参数参见自定义控件属性。
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<declare-styleable name="FantTextView">
+        <attr name="fang_alpha" format="boolean"></attr>
+        <attr name="fang_typeface" format = "string">
+        </attr>
+</resources>
+
+
+自定义控件：
+public class FangTextView extends TextView {
+	private Typeface typeface;
+	private boolean isCanPressed;
+
+	public FangTextView(Context context) {
+		super(context);
+		init(context, null);
+	}
+
+	public FangTextView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init(context, attrs);
+	}
+
+	public FangTextView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		init(context, attrs);
+
+	}
+
+	private void init(Context context, AttributeSet attrs) {
+		if (attrs != null) {
+			TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.FantTextView);
+			isCanPressed = ta.getBoolean(R.styleable.FantTextView_fang_alpha, false);
+			String typeface = ta.getString(R.styleable.FantTextView_fang_typeface);
+			try {
+				if (typeface!=null) {
+					if (typeface.equals(CustomTypeface.JIAN.getName())) {
+						setTypeface(BaseApp.TYPEFACE_JIAN);
+					}else if (typeface.equals(CustomTypeface.FAN.getName())) {
+						setTypeface(BaseApp.TYPEFACE_FAN);
+					}else if (typeface.equals(CustomTypeface.NUM.getName())) {
+						setTypeface(BaseApp.TYPEFACE_NUM);
+					}
+				}
+			
+			} catch (Exception e) {
+			}
+			ta.recycle();
+		}
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		int action = event.getAction();
+		switch (action) {
+		case MotionEvent.ACTION_DOWN:
+			if (isCanPressed) {
+				this.setAlpha(0.5f);
+				invalidate();
+			}
+
+			break;
+		case MotionEvent.ACTION_UP:
+		case MotionEvent.ACTION_CANCEL:
+			if (isCanPressed) {
+				this.setAlpha(1f);
+				invalidate();
+			}
+			break;
+		}
+
+		return super.onTouchEvent(event);
+	}
+
+}

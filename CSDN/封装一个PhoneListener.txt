@@ -1,0 +1,94 @@
+
+
+先创建一个抽象类AbstractPhoneStateListener，该抽象类继承PhoneStateListener。PhoneStateListener能够监听
+手机通话的状态，前提是要有下面几个权限：
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- 读取手机联系人 -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+在这个抽象类声明一个抽象方法：public abstract void onIncoming(int state, String incomingNumber)
+在电话来时进行回调，另外再声明一个注册电话监听的方法，只有注册之后，PhoneStateListener的方法
+才会有数据。
+
+
+
+public abstract class AbstractPhoneStateListener extends PhoneStateListener {
+
+	@Override
+	public void onCallStateChanged(int state, String incomingNumber) {
+		super.onCallStateChanged(state, incomingNumber);
+		switch (state) {
+		case TelephonyManager.CALL_STATE_IDLE:// 空闲
+			Log.i("AbstractPhoneStateListener", "挂了" +incomingNumber);
+			break;
+		case TelephonyManager.CALL_STATE_RINGING:// 来电
+			Log.i("AbstractPhoneStateListener", "来电话了" +incomingNumber);
+			onIncoming(state, incomingNumber);
+			break;
+		case TelephonyManager.CALL_STATE_OFFHOOK: // 摘机（正在通话中）
+			Log.i("AbstractPhoneStateListener", "正在通话中" +incomingNumber);
+			break;
+
+		default:
+			break;
+		}
+
+	}
+
+	public abstract void onIncoming(int state, String incomingNumber);
+
+	/**
+	 * 监听来电变化情况
+	 */
+	public void registerListenerForPhoneState(TelephonyManager telephonyManager) {
+		telephonyManager.listen(this, PhoneStateListener.LISTEN_CALL_STATE);
+	}
+
+
+}
+
+
+再创建一个AbstractPhoneStateListener的子类I2WPhoneStateListener，这个子类中
+声明一个接口，里面有个方法void onIncoming(int state, String incomingNumber)。
+用于回调。
+
+public class I2WPhoneStateListener extends AbstractPhoneStateListener{
+	@Override
+	public void onIncoming(int state, String incomingNumber) {
+
+		if (mOnIncomingListener!=null) {
+			mOnIncomingListener.onIncoming(state, incomingNumber);
+		}
+	}
+	
+	public interface OnIncomingListener{
+		void onIncoming(int state, String incomingNumber);
+	}
+	
+	private OnIncomingListener mOnIncomingListener;
+	
+	public void setOnIncomingListener(OnIncomingListener l){
+		this.mOnIncomingListener = l	;
+	}
+
+}
+
+
+
+封装的使用：
+我们可以在Activity或者Application中使用这个封装，实现OnIncomingListener接口，在onCreate()方法中使用。
+protected void onCreate(){
+……
+telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+I2WPhoneStateListener i2wPhoneStateListener = new I2WPhoneStateListener();
+i2wPhoneStateListener.setOnIncomingListener(this);
+i2wPhoneStateListener.registerListenerForPhoneState(telephonyManager);
+}
+
+@Override
+	public void onIncoming(int state, String incomingNumber) {
+		Log.e("tag","state:"+state+" ,incomingNumber:"+incomingNumber);
+		//需要利用来电进行的事情，比如发短信，记录等等。
+	}

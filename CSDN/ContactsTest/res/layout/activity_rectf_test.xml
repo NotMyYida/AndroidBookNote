@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        >
+        
+        <EditText 
+            android:id="@+id/et_dx"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="dx"
+            />
+        
+        <EditText 
+            android:id="@+id/et_dy"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="dy"
+            />
+        
+        <Button
+            android:id="@+id/btn_inset"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Inset"
+            />
+        
+    </LinearLayout>
+    
+    <Button 
+        android:id="@+id/btn_recover"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="还原"
+        />
+    
+    <TextView 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/method_hint_zh"
+        />
+    
+    <TextView 
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/param_dx_hint_zh"
+        />
+    
+    <TextView 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/param_dy_hint_zh"
+        />
+    
+    
+    <TextView 
+        android:layout_margin="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="该矩形的坐标为 (100,100,600,600)"
+        />
+    
+    
+    <com.yhxu.contactstest.RectFView 
+        android:id="@+id/rectf_view"
+        android:layout_width="match_parent"
+		android:layout_height="match_parent"
+        />
+    
+
+</LinearLayout>
