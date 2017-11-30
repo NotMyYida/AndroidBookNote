@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+	<h1>我的第一段</h1>
+	
+	<p>
+	JavaScript 能够对事件作出反应。比如对按钮的点击：
+	</p>
+	
+	<button type="button" onclick="alert('Welcome')">点击这里</button>
+
+	
+	<p>JavaScript 能够直接写入 HTML 输出流中 ：</p>
+	
+	<script>
+	document.write("<h1>This is a heading</h1>")
+	document.write("<p>This is a paragraph</p>")
+	</script>
+	
+	<p>
+	您只能在 HTML 输出流中使用 <strong>document.write</strong>.如果您在文档已加载后使用它(比如在函数中)，会覆盖整个文档
+	</p>
+	
+	
+	
+	<h1>我的第一段 JavaScript</h1>
+	<p id="demo">
+	JavaScript 能够改变 HTML 元素的内容
+	</p>
+	
+	<script>
+	function myFunction()
+	{
+	x = document.getElementById("demo");	//找到元素
+	x.innerHTML = "Hello JavaScript!";
+	}
+	</script>
+	
+	
+	<button type="button" onclick="myFunction()"> 点击这里2</button>
+	
+	
+	<p id="demo2">
+	JavaScript 能改变 HTML 元素的样式。变红
+	</p>
+	
+	<script>
+	function myFunction(){
+	x = document.getElementById("demo2")		//找到元素
+	x.style.color = "#ff0000"
+	}
+	</script>
+	
+	<button type="button" onclick="myFunction()">点击这里变红</button>
+	
+	<!--
+	<script>
+	var name = "孤傲苍狼"
+	alert("name是"+ typeof name + "类型"+name)
+	var age = 24
+	var flag = true
+	var email
+	name = 10
+	alert("name改变了类型 ->"+typeof name + "类型" + name)
+	</script>
+	-->
+	
+	<!--
+	<script type="text/javascript">
+	var a = 10
+	var b = a;
+		b = 20;
+	alert("a="+a)
+	
+	var b1 = true
+	var b2 = b1
+		b2 = false
+	alert("b1="+b1)
+	</script>
+	--->
+	
+	<!--
+	<script type="text/javascript">
+		var obj1 = new Object()
+		var obj2 = obj1
+		obj2.name = "孤傲苍狼"
+		alert(obj1.name)
+	</script>
+	-->
+	
+	
+	<script type="text/javascript">
+	var bFalse = false
+	var sRed = "red"
+	var iZero = 0
+	var iThreeFourFive = 345
+	var oObject = new Object()
+	var oNull = null
+	var oUndefined
+	var oNaN = parseInt("abc")
+	
+	document.writeln("<XMP>")
+	document.writeln("oNaN=parseInt(\"abc\")返回的结果是"+oNaN)
+	document.writeln("bool类型的数false与!运算符运算之后的结果是："+(!bFalse))
+	document.writeln("字符串sRed与!运算符运算之后的结果是："+(!sRed))
+	document.writeln("数字0与!运算符运算之后的结果是："+(!iZero))
+	document.writeln("数字345与与!运算符运算之后的结果是："+(!iThreeFourFive))
+	document.writeln("对象oObject与!运算符运算之后的结果是："+(!oObject))
+	document.writeln("NaN与!运算符运算之后的结果是："+(!oNaN))
+	document.writeln("null与!运算符运算之后的结果是："+(!oNull))
+	document.writeln("undifined与!运算符运算之后的结果是："+(!oUndefined))
+	document.writeln("</XMP>")
+	</script>
+	
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	
+	<!--
+	<script type="text/javascript">
+	var str = "window.alert('孤傲苍狼');"
+	eval(str) // eval() 函数可用于计算某个字符，并执行其中的 javaScript 代码
+	
+	function test(str){
+		alert(str)
+	}
+	
+	window.alert(test)
+	
+	var myFunction = test
+	myFunction("白虎神拳")
+	window.alert(myFunction)
+	
+	var retVal = test("test")
+	alert("retVal="+retVal)
+	</script>
+	-->
+	
+	<!--
+	<script type="text/javascript">
+	
+	var square = new Function("x","y","var sum ; sum = x + y; return sum;")
+	alert("square(2,3)的结果是："+square(2,3))
+	
+	</script>
+	-->
+	
+	
+	<p>请输入数字，如果输入值不是数字，浏览器会弹出提示框。</p>
+	
+	<input id="demo" type="text">
+	
+	<script>
+	function myFunction(){
+	var x = document.getElementById("demo").value;
+	if(x == "" || isNaN(x)){
+		alert("Not Numeric")
+	}
+	}
+	</script>
+
+	<button type="button" onclick="myFunction()">点击这里</button>
+	
+	<br/>
+	
+	
+<p>请输入数字。如果输入值不是数字，浏览器会弹出提示框。</p>
+
+<input id="demo" type="text">
+
+<script>
+function myFunction()
+{
+var x=document.getElementById("demo").value;
+if(x==""||isNaN(x))
+	{
+	alert("Not Numeric");
+	}
+}
+</script>
+
+<button type="button" onclick="myFunction()">点击这里</button>
+	
+	
+	<h1>My Web Page</h1>
+	<p id="demo3">A Paragraph</p>
+	<button type="button" onclick="myFunction2()">Try it</button>
+	<script>
+	function myFunction2(){
+	document.getElementById("demo3").innerHTML="My First JavaScript Function"
+	}
+	</script>
+	
+	
+	<h1>我的第一张网页</h1>
+	
+	<p id="demo4">我的第一个段落</p>
+	
+	<script>
+	document.getElementById("demo4").innerHTML="<p>我的第一段 JavaScript</p>"
+	</script>
+	
+	
+	<script type="text/javascript">
+	var browser = navigator.appName
+	var b_version = navigator.appVersion
+	var version = parseFloat(b_version)
+	document.write("浏览器名称："+browser)
+	document.write("<br />")
+	document.write("浏览器版本："+version)
+	document.write("<br />")
+	document.write("平台："+navigator.platform)
+	document.write("<br />")
+	document.write("Cookies 启用："+navigator.cookieEnabled)
+	document.write("<br />")
+	document.write("浏览器的用户代理报头：")
+	document.write(navigator.userAgent)
+	</script>
+	
+	
+</body>
+
+</html>

@@ -1,0 +1,315 @@
+<html>
+	<head>
+	
+	<!--body{
+		background-color : red
+		}  在这里设置的style优先级更高-->
+		<style type="text/css">
+		
+		p{
+		margin-left : 20px
+		}
+		</style>
+	
+	</head>
+	
+	<body bgcolor="gray"><!-- 加了一个bgcolor属性 设置背景颜色-->
+	<!-- a标签代表链接   href后面加网址  color属性表示暂时还不知道有什么用---->
+		<a href="http://www.w3school.com.cn" color="green">This is a Link!</a>
+		<br>
+		<a href="#label">跳到锚那里 注意href属性后面是#+标签</a>
+		<!--H1表示最大标题-->
+		<h1 align="center-left"> H1表示最大标题 </h1>
+		
+		<h2 align="center-left"> H2比H1小一级</h2>
+		
+		<img src="14.jpg" width="100" height="80"/>			<!--img标签标示图片 width和height表示-->
+		<img src="18.jpg" width="100" height="80"/>				<!-- 不会换行-->
+		<img src="19.jpg" width="100" height="80"/>	
+		<img src="36.jpg" width="100" height="80"/>	
+		<img src="39.jpg" width="100" height="80"/>	
+		<br> <img src="35.jpg"/>
+	
+		<p>请仅仅把标题标签当为标题，不要为了使用粗体而使用标题标签 </p>
+		
+		<hr />		<!--这是水平线-->
+		
+		<p>这段是用来测试水平线的</p>
+		
+		<p> 这个用来测试br标签来换行</br>				<!-- </br> 标签可以用于换行（放在句子尾部表示这行结束），这样就不用再用一对p来划分新的段落了-->
+			这是第二行
+			<br>这是第三行
+			这是第四行									<!-- <br> 标签表示后面的字为1行，所以第四行和第三行是在同一行的-->
+		</p>
+		
+		<!--用style改变样式-->
+		
+		<h3 style="background-color:red"> 三级标题设置背景颜色Style</h3>
+		<!--<h4 style="background-image:39.jpg">四级标题设置背景图片 </h4>-->
+		
+		<!--
+		
+		标签	描述
+		<b>	定义粗体文本。
+		<big>	定义大号字。
+		<em>	定义着重文字。
+		<i>	定义斜体字。
+		<small>	定义小号字。
+		<strong>	定义加重语气。
+		<sub>	定义下标字。
+		<sup>	定义上标字。
+		<ins>	定义插入字。		字的底部加一体横线
+		<del>	定义删除字。		字的中间加一条横线
+		<s>	不赞成使用。使用 <del> 代替。
+		<strike>	不赞成使用。使用 <del> 代替。
+		<u>	不赞成使用。使用样式（style）代替。
+		-->
+																				   <!--color无效啊 -->
+		<b>测试粗体文字</b><i>斜体字斜体斜体</i>这是一般文字<big>大号字体</big><em color="red">着重字体，加了着重的</em><small>小号字体小号字体</small>
+		<br><strong>加重语气，哼？ </strong>
+		<br>下标<sub>下标字</sub><sup>上标字</sup>
+		<br><ins>插入字</ins><del>删除字</del>
+		<br><code>计算机代码</code>
+		
+		<p>
+		WWF 的目标是 ： <q>构建人与社会和谐共存的社会</q>		<!--q 表示引用-->
+		</p>
+		
+		<p>
+		以下内容引用自 WWF 网站：
+		</p>
+		<blockquote cite="http://www.worldwildlife.org/who/index.html">		<!--blockquote这种引用 是有段落结构的 -->
+		五十年来，WWF 一直致力于保护自然界的未来。
+		世界领先的环保组织，WWF 工作于 100 个国家，
+		并得到美国一百二十万会员及全球近五百万会员的支持。
+		</blockquote>
+		
+		<p>
+		<abbr title="World Health Organization">W H O</abbr>成立于1948年		<!--字体下面加了虚线-->
+		</p>
+		
+		<p><dfn title="World Health Organization">W H O</dfn>成立于1948年</p>	<!--变成了斜体-->
+		
+		<address>								<!-- 专门用于地址的 -->
+		Written by Donald Duck.</br>
+		Visit us at :</br>
+		Example.com </br>
+		Box 564,Disneyland</br>
+		USA
+		</address>
+		
+		<p><cite>The Scream</cite> by Edward Munch. Painted in 1893.</p>		<!--cite里面的变成了斜体 定义著作的标题-->
+		
+		<p><bdo dir="rtl">This text will be written from right to left</bdo></p>	<!--倒着读-->
+		
+		<p>HTML kbd 元素表示键盘输入:</p>
+		
+		<p> <kbd>File | Open .. kbd标签</kbd></p>
+		
+		<samp> 
+		demo.example.com login: Apr 12 09:10:17
+		Linux 2.6.10-grsec+gg3+e+fhs6b+nfs+gr0501+++p3+c4a+gr2b-reslog-v6.189  samp标签
+		</samp>
+		
+		<br>
+		<code>
+		var person = { firstName:"Bill", lastName:"Gates", age:50, eyeColor:"blue" }	code标签
+		</code>
+		
+		<p>
+		<code>
+		<pre>
+		-------------------------------- 分割线 --------------------------------------
+		var person = {
+		firstName:"Bill",
+		lastName:"Gates",
+		age:50,
+		eyeColor:"blue"
+		}
+		//code标签里面加了pre标签
+		</pre>
+		</code>
+		</p>
+		
+		<p>Einstein wrote:</p>
+		<p><var>E = m c<sup>2</sup></var></p>
+		
+		<p style="color: red; margin-left : 20px">This is a paragraph  把style放在标签里面</p>
+		
+		<p>
+		<a href="http://www.w3school.com.cn/" target="_blank"> 有target的，在新窗口打开</a>
+		</p>
+		
+		<a name="label">锚（显示在页面的文本）</a>
+		
+		<img src="http://www.w3school.com.cn/images/boat.gif"/>
+		
+		<br>表格
+		<table bolder="10">
+		<tr>
+		<td>row 1,cell 1</td>			<!--td 表示一个单元格  tr表示一行 -->
+		<td>row 1,cell 2 </td>
+		</tr>
+		<tr>
+		<td>row 2,cell 1</td>
+		<td>row 2,cell 2</td>
+		</tr>
+		</table>
+		
+		
+		<br>
+		<hr />
+		<table bolder="1">
+		
+		<tr>
+		<th>Heading</th>
+		<th>Another Heading</th>
+		</tr>
+		
+		<tr>
+		<td>row 1,cell 1</td>
+		<td>row 1,cell 2</td>
+		</tr>
+		
+		<tr>
+		<td>row 2,cell 1</td>
+		<td>row 2,cell 2</td>
+		</tr>
+		
+		</table>
+		
+		<br>
+		<table bolder="1">
+		
+		<tr>
+		<th>Heading</th>
+		<th>Another Heading</th>
+		</tr>
+		
+		<tr>
+		<td>row 1,cell 1</td>
+		<td>row 1,cell 2</td>
+		</tr>
+		
+		<tr>
+		<td>&nbsp;</td>
+		<td>row 2,cell 2</td>
+		</tr>
+		
+		</table>
+		
+		<p>
+		<b>注释：</b>frame属性无法在 Internet Explorer 中正确地显示
+		</p>
+		<p>Table with frame = "box"</p>
+		<table frame="box">
+			<tr>
+			<th>Month</th>
+			<th>Saving</th>
+			</tr>
+			
+			<tr>
+			<td>January</td>
+			<td>$100</td>
+			</tr>
+		</table>
+		
+		
+		<table frame="vsides">
+			<tr>
+			<th>Month</th>
+			<th>Saving</th>
+			</tr>
+			
+			<tr>
+			<td>January</td>
+			<td>$100</td>
+			</tr>
+		</table>
+		
+		<ul>					<!-- ul表示无序列表，每个列表始于li -->
+		<li>Coffee</li>
+		<li>Milk</li>
+		</ul>
+		
+		<ul>
+		<li><img src="18.jpg" width="100" height="80"/> 
+			<img src="18.jpg" width="100" height="80"/>	</li>
+		<li><img src="36.jpg" width="100" height="80"/>	
+			<img src="39.jpg" width="100" height="80"/>	</li>
+		</ul>
+
+		<ol>			<!--ol表示有序的列表-->
+		<li>Coffee</li>
+		<li>Milk</li>
+		</ol>
+		
+		<ol>
+		<li><img src="18.jpg" width="100" height="80"/> 
+			<img src="18.jpg" width="100" height="80"/>	</li>
+		<li><img src="36.jpg" width="100" height="80"/>	
+			<img src="39.jpg" width="100" height="80"/>	</li>
+		</ol>
+		
+		<dl>
+		<dt>Coffee</dt>
+		<dd>Black hot drink</dd>
+		<dt>Milk</dt>
+		<dd>White cold drink</dd>
+		</dl>
+		
+		
+		<h4>Disc 项目符号列表：</h4>
+		<ul type="disc">
+		<li>苹果</li>
+		<li>香蕉</li>
+		<li>柠檬</li>
+		<li>桔子</li>
+		</ul>
+		
+		<h4>Circle 项目符号列表：</h4>
+		<ul type="circle">
+		<li>苹果</li>
+		<li>香蕉</li>
+		<li>柠檬</li>
+		<li>桔子</li>
+		</ul>
+		
+		<h4> 项目符号列表</h4>
+		<ul type="square">
+		<li>苹果</li>
+		<li>香蕉</li>
+		<li>柠檬</li>
+		<li>桔子</li>
+		</ul>
+		
+		
+		<h4>数字列表：</h4>
+		<ol>
+		<li>苹果</li>
+		<li>香蕉</li>
+		<li>柠檬</li>
+		<li>桔子</li>
+		</ol>
+		
+		<h4>字母列表：</h4>
+		<ol type="a">
+		<li>苹果</li>
+		<li>香蕉</li>
+		<li>柠檬</li>
+		<li>桔子</li>
+		</ol>
+		
+		
+		<h4>罗马字母列表：</h4>
+		<ol type="I">
+		<li>苹果</li>
+		<li>香蕉</li>
+		<li>柠檬</li>
+		<li>桔子</li>
+		</ol>
+		
+		
+		
+	</body>
+</html>
