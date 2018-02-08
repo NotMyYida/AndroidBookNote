@@ -1,0 +1,2116 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    
+        <html xmlns="http://www.w3.org/1999/xhtml">
+    
+<head>
+        <link rel="canonical" href="http://blog.csdn.net/lmj623565791/article/details/75000580" />
+
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="alternate" media="handheld" href="#" />
+
+    <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848" />
+
+    <title>滴滴插件化方案 VirtualApk 源码解析 - Hongyang - CSDN博客</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="本文已在我的公众号hongyangAndroid原创首发。   转载请标明出处：    http://blog.csdn.net/lmj623565791/article/details/75000580    本文出自张鸿洋的博客    本文已在我的公众号hongyangAndroid原创首发,文章合集。一、概述之前一直没有写过插件化相关的博客，刚好最近滴滴和360分别开源了自家的插件" />
+
+    <meta name="keywords" content="插件化,Android,VirtualApk" />
+    <script src="http://static.blog.csdn.net/scripts/blog_static_head.min.js?v1" type="text/javascript"></script>
+
+
+        <link rel="Stylesheet" type="text/css" href="http://static.blog.csdn.net/skin/skin-yellow/css/style.css?v=2.2" />
+
+    
+
+    <link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="/lmj623565791/rss/list" />
+    <link rel="shortcut icon" href="http://c.csdnimg.cn/public/favicon.ico" />
+    <link type="text/css" rel="stylesheet" href="http://static.blog.csdn.net/scripts/SyntaxHighlighter/styles/default.css" />
+
+
+
+
+
+    <link href="http://c.csdnimg.cn/blog/csdn_public_blog_detail.min.css" type="text/css" rel="stylesheet" />
+
+        <link rel="stylesheet" href="http://static.blog.csdn.net/css/csdn_blog_detail.min.css" />
+
+    <!-- 请置于所有广告位代码之前 -->
+    <script src="http://dup.baidustatic.com/js/ds.js"></script>
+
+</head>
+
+
+<body>
+        <div class="csdn-tracking-statistics" data-pid="blog" data-view="true" data-mod="ad_popu_72" data-mtp="62" data-order="40" data-con="ad_content_2072">
+            <script id="popuLayer_js_q" src="http://ads.csdn.net/js/popuLayer.js" defer="defer" type="text/javascript"></script>
+            <div id="layerd" style="position: fixed;bottom:0px;right:0px;line-height:0px;z-index:1000">
+                <div class="J_close layer_close" style="display:;background-color:#efefef;padding:0px;color:#333;font:12px/24px Helvetica,Tahoma,Arial,sans-serif;text-align:right;">关闭</div><!-- 广告占位容器 -->
+                <div id="cpro_u2895327">
+                    <!-- 投放代码 -->
+                            <script type="text/javascript" src="//cee1.iteye.com/ojylrgbyk.js"></script>
+
+
+
+                </div>
+            </div>
+            <script>
+                document.getElementById("popuLayer_js_q").onload = function () {
+                    var styObjd = styObj = { width: "300px", "height": parseInt(250) + 28 };
+                    window.CSDN.Layer.PopuLayer("#layerd", { storageName: "layerd", styleObj: styObjd, total: 50, expoire: 1000 * 60 });
+                }</script>
+
+
+        </div>
+
+
+    <!--new top-->
+    <script id="toolbar-tpl-scriptId" src="http://csdnimg.cn/public/common/toolbar/js/content_toolbar.js" type="text/javascript" domain="http://blog.csdn.net"></script>
+
+    <link rel="stylesheet" href="http://csdnimg.cn/public/common/toolbar/content_toolbar_css/content_toolbar.css">
+    <!--new top-->
+    <div id="container">
+        
+<div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h2>
+                <a href="http://blog.csdn.net/lmj623565791">Hongyang</a></h2>
+            <h3>生命不息，奋斗不止，万事起于忽微，量变引起质变</h3>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+        
+    
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg">
+    </div>
+    <div class="navigator">
+        <ul>           
+                <li id="btnContents"><a href="http://blog.csdn.net/lmj623565791?viewmode=contents"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_mulu'])">
+                    <img src="http://static.blog.csdn.net/images/ico_list.gif">目录视图</span></a></li>
+                <li id="btnView"><a href="http://blog.csdn.net/lmj623565791?viewmode=list"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_zhaiyao'])">
+                    <img src="http://static.blog.csdn.net/images/ico_summary.gif">摘要视图</span></a></li>
+                <li id="btnRss"><a href="http://blog.csdn.net/lmj623565791/rss/list"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_RSS'])">
+                    <img src="http://static.blog.csdn.net/images/ico_rss.gif">订阅</span></a></li>                   
+            
+
+            </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "lmj623565791";
+    var _blogger = username;
+    var blog_address = "http://blog.csdn.net/lmj623565791";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";  
+</script>
+
+        <div id="body">
+            <div id="main">
+                <div class="main">
+                    <div class="ad_class">
+
+
+
+                    </div>
+
+                    
+
+ <script src="http://csdnimg.cn/rabbit/exposure-click/main-1.0.5.js"></script>
+
+<script   type="text/javascript" src="http://static.blog.csdn.net/scripts/category.js"></script>
+
+  <script type="text/ecmascript">
+      var title="滴滴插件化方案 VirtualApk 源码解析";
+      window.quickReplyflag = true;
+      var isBole = false; 
+      var fasrc="http://my.csdn.net/my/favorite/miniadd?t=%e6%bb%b4%e6%bb%b4%e6%8f%92%e4%bb%b6%e5%8c%96%e6%96%b9%e6%a1%88+VirtualApk+%e6%ba%90%e7%a0%81%e8%a7%a3%e6%9e%90&u=http://blog.csdn.net/lmj623565791/article/details/75000580"
+    </script>
+<div id="article_details" class="details">
+    
+<div class="article_title">   
+         <span class="ico ico_type_Original"></span>
+
+    <h1>
+        <span class="link_title"><a href="/lmj623565791/article/details/75000580">
+        滴滴插件化方案 VirtualApk 源码解析        
+           
+        </a>
+        </span>
+
+         
+    </h1>
+</div>
+
+
+    
+    <div class="article_manage clearfix">
+        <div class="article_l">
+            <span class="link_categories">
+            标签：
+              <a href='http://www.csdn.net/tag/%e6%8f%92%e4%bb%b6%e5%8c%96' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">插件化</a><a href='http://www.csdn.net/tag/Android' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">Android</a><a href='http://www.csdn.net/tag/VirtualApk' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">VirtualApk</a>
+            </span>
+        </div>
+        <div class="article_r">
+            <span class="link_postdate">2017-07-12 00:03</span>
+            <span class="link_view" title="阅读次数">22070人阅读</span>
+            <span class="link_comments" title="评论次数"> <a href="#comments" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_pinglun'])">评论</a>(45)</span>
+            <span class="link_collect csdn-tracking-statistics" data-pid="blog"  data-mod="popu_171"> <a href="javascript:void(0);" onclick="javascript:collectArticle('%e6%bb%b4%e6%bb%b4%e6%8f%92%e4%bb%b6%e5%8c%96%e6%96%b9%e6%a1%88+VirtualApk+%e6%ba%90%e7%a0%81%e8%a7%a3%e6%9e%90','75000580');return false;" title="收藏">收藏</a></span>
+             <span class="link_report"> <a href="#report" onclick="javascript:report(75000580,2);return false;" title="举报">举报</a></span>
+
+        </div>
+    </div>    <style type="text/css">        
+            .embody{
+                padding:10px 10px 10px;
+                margin:0 -20px;
+                border-bottom:solid 1px #ededed;                
+            }
+            .embody_b{
+                margin:0 ;
+                padding:10px 0;
+            }
+            .embody .embody_t,.embody .embody_c{
+                display: inline-block;
+                margin-right:10px;
+            }
+            .embody_t{
+                font-size: 12px;
+                color:#999;
+            }
+            .embody_c{
+                font-size: 12px;
+            }
+            .embody_c img,.embody_c em{
+                display: inline-block;
+                vertical-align: middle;               
+            }
+             .embody_c img{               
+                width:30px;
+                height:30px;
+            }
+            .embody_c em{
+                margin: 0 20px 0 10px;
+                color:#333;
+                font-style: normal;
+            }
+    </style>
+    <script  type="text/javascript">
+        $(function () {
+            try
+            {
+                var lib = eval("("+$("#lib").attr("value")+")");
+                var html = "";
+                if (lib.err == 0) {
+                    $.each(lib.data, function (i) {
+                        var obj = lib.data[i];
+                        //html += '<img src="' + obj.logo + '"/>' + obj.name + "&nbsp;&nbsp;";
+                        html += ' <a href="' + obj.url + '" target="_blank">';
+                        html += ' <img src="' + obj.logo + '">';
+                        html += ' <em><b>' + obj.name + '</b></em>';
+                        html += ' </a>';
+                    });
+                    if (html != "") {
+                        setTimeout(function () {
+                            $("#lib").html(html);                      
+                            $("#embody").show();
+                        }, 100);
+                    }
+                }      
+            } catch (err)
+            { }
+            
+        });
+    </script>
+      <div class="category clearfix">
+        <div class="category_l">
+           <img src="http://static.blog.csdn.net/images/category_icon.jpg">
+            <span>分类：</span>
+        </div>
+        <div class="category_r">
+                    <label  onclick="GetCategoryArticles('2680605','lmj623565791','top','75000580');">
+                        <span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_fenlei']);">【Android 源码解析】<em>（30）</em></span>
+                      <img class="arrow-down" src="http://static.blog.csdn.net/images/arrow_triangle _down.jpg" style="display:inline;">
+                      <img class="arrow-up" src="http://static.blog.csdn.net/images/arrow_triangle_up.jpg" style="display:none;">
+                        <div class="subItem">
+                            <div class="subItem_t"><a  href="http://blog.csdn.net/lmj623565791/article/category/2680605"  target="_blank">作者同类文章</a><i class="J_close">X</i></div>
+                            <ul class="subItem_l" id="top_2680605">                            
+                            </ul>
+                        </div>
+                    </label>                    
+        </div>
+    </div>
+        <div   class="bog_copyright">         
+            <p  class="copyright_p" >版权声明：本文为博主原创文章，未经博主允许不得转载。</p>
+        </div>
+
+
+
+
+
+
+<div id="article_content" class="article_content csdn-tracking-statistics" data-pid="blog"  data-mod=popu_307  data-dsm = "post" >
+        <div class="markdown_views"><blockquote>
+  <p>本文已在我的公众号hongyangAndroid原创首发。 <br>
+  转载请标明出处：  <br>
+  <a href="http://blog.csdn.net/lmj623565791/article/details/75000580">http://blog.csdn.net/lmj623565791/article/details/75000580</a>  <br>
+  本文出自<a href="http://blog.csdn.net/lmj623565791/">张鸿洋的博客</a></p>
+  
+  <p>本文已在我的公众号hongyangAndroid原创首发,<a href="https://github.com/hongyangAndroid/hongyangWeixinArticles">文章合集</a>。</p>
+</blockquote>
+
+<h2 id="一概述">一、概述</h2>
+
+<p>之前一直没有写过插件化相关的博客，刚好最近滴滴和360分别开源了自家的插件化方案，赶紧学习下，写两篇博客，第一篇是滴滴的方案：</p>
+
+<ul>
+<li><a href="https://github.com/didi/VirtualAPK" target="_blank">https://github.com/didi/VirtualAPK</a></li>
+</ul>
+
+<p>那么其中的难点很明显是对四大组件支持，因为大家都清楚，四大组件都是需要在AndroidManifest中注册的，而插件apk中的组件是不可能预先知晓名字，提前注册中宿主apk中的，所以现在基本都采用一些hack方案类解决，VirtualAPK大体方案如下：</p>
+
+<ul>
+<li>Activity：在宿主apk中提前占几个坑，然后通过“欺上瞒下”（这个词好像是360之前的ppt中提到）的方式，启动插件apk的Activity；因为要支持不同的launchMode以及一些特殊的属性，需要占多个坑。</li>
+<li>Service：通过代理Service的方式去分发；主进程和其他进程，VirtualAPK使用了两个代理Service。</li>
+<li>BroadcastReceiver：静态转动态</li>
+<li>ContentProvider：通过一个代理Provider进行分发。</li>
+</ul>
+
+<p>这些占坑的数量并不是固定的，比如Activity想支持某个属性，该属性不能动态设置，只能在Manifest中设置，那就需要去占坑支持。所以占坑数量这些，可以根据自己的需求进行调整。</p>
+
+<p>下面就逐一去分析代码啦~</p>
+
+<blockquote>
+  <p>注：本篇博客涉及到的framework逻辑，为API 22. <br>
+  <br>分期版本为 com.didi.virtualapk:core:0.9.0</p>
+</blockquote>
+
+
+
+<h2 id="二activity的支持">二、Activity的支持</h2>
+
+<p>这里就不按照某个流程一行行代码往下读了，针对性的讲一些关键流程，可能更好阅读一些。</p>
+
+<p>首先看一段启动插件Activity的代码：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">final</span> String pkg = <span class="hljs-string">"com.didi.virtualapk.demo"</span>;
+<span class="hljs-keyword">if</span> (PluginManager.getInstance(<span class="hljs-keyword">this</span>).getLoadedPlugin(pkg) == <span class="hljs-keyword">null</span>) {
+    Toast.makeText(<span class="hljs-keyword">this</span>, <span class="hljs-string">"plugin [com.didi.virtualapk.demo] not loaded"</span>, Toast.LENGTH_SHORT).show();
+    <span class="hljs-keyword">return</span>;
+}
+
+<span class="hljs-comment">// test Activity and Service</span>
+Intent intent = <span class="hljs-keyword">new</span> Intent();
+intent.setClassName(pkg, <span class="hljs-string">"com.didi.virtualapk.demo.aidl.BookManagerActivity"</span>);
+startActivity(intent);</code></pre>
+
+<p>可以看到优先根据包名判断该插件是否已经加载，所以在插件使用前其实还需要调用</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs avrasm">pluginManager<span class="hljs-preprocessor">.loadPlugin</span>(apk)<span class="hljs-comment">;</span></code></pre>
+
+<p>加载插件。</p>
+
+<p>这里就不赘述源码了，大致为调用<code>PackageParser.parsePackage</code>解析apk，获得该apk对应的PackageInfo，资源相关（AssetManager，Resources），DexClassLoader（加载类），四大组件相关集合（mActivityInfos，mServiceInfos，mReceiverInfos，mProviderInfos），针对Plugin的PluginContext等一堆信息，封装为LoadedPlugin对象。</p>
+
+<blockquote>
+  <p>详细可以参考<code>com.didi.virtualapk.internal.LoadedPlugin</code>类。</p>
+</blockquote>
+
+<p>ok，如果该插件以及加载过，则直接通过startActivity去启动插件中目标Activity。</p>
+
+
+
+<h3 id="1替换activity">（1）替换Activity</h3>
+
+<p>这里大家肯定会有疑惑，该Activity必然没有在Manifest中注册，这么启动不会报错吗？</p>
+
+<p>正常肯定会报错呀，所以我们看看它是怎么做的吧。</p>
+
+<p>跟进startActivity的调用流程，会发现其最终会进入Instrumentation的execStartActivity方法，然后再通过ActivityManagerProxy与AMS进行交互。</p>
+
+<p>而Activity是否存在的校验是发生在AMS端，所以我们在于AMS交互前，提前将Activity的ComponentName进行替换为占坑的名字不就好了么？</p>
+
+<p>这里可以选择hook Instrumentation，或者ActivityManagerProxy都可以达到目标，VirtualAPK选择了hook Instrumentation.</p>
+
+<p>打开<code>PluginManager</code>可以看到如下方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">hookInstrumentationAndHandler</span>() {
+    <span class="hljs-keyword">try</span> {
+        Instrumentation baseInstrumentation = ReflectUtil.getInstrumentation(<span class="hljs-keyword">this</span>.mContext);
+        <span class="hljs-keyword">if</span> (baseInstrumentation.getClass().getName().contains(<span class="hljs-string">"lbe"</span>)) {
+            <span class="hljs-comment">// reject executing in paralell space, for example, lbe.</span>
+            System.exit(<span class="hljs-number">0</span>);
+        }
+
+        <span class="hljs-keyword">final</span> VAInstrumentation instrumentation = <span class="hljs-keyword">new</span> VAInstrumentation(<span class="hljs-keyword">this</span>, baseInstrumentation);
+        Object activityThread = ReflectUtil.getActivityThread(<span class="hljs-keyword">this</span>.mContext);
+        ReflectUtil.setInstrumentation(activityThread, instrumentation);
+        ReflectUtil.setHandlerCallback(<span class="hljs-keyword">this</span>.mContext, instrumentation);
+        <span class="hljs-keyword">this</span>.mInstrumentation = instrumentation;
+    } <span class="hljs-keyword">catch</span> (Exception e) {
+        e.printStackTrace();
+    }
+}
+</code></pre>
+
+<p>可以看到首先通过反射拿到了原本的<code>Instrumentation</code>对象，拿的过程是首先拿到ActivityThread，由于ActivityThread可以通过静态变量<code>sCurrentActivityThread</code>或者静态方法<code>currentActivityThread()</code>获取，所以拿到其对象相当轻松。拿到ActivityThread对象后，调用其<code>getInstrumentation()</code>方法，即可获取当前的Instrumentation对象。</p>
+
+<p>然后自己创建了一个VAInstrumentation对象，接下来就直接反射将VAInstrumentation对象设置给ActivityThread对象即可。</p>
+
+<p>这样就完成了hook Instrumentation,之后调用Instrumentation的任何方法，都可以在VAInstrumentation进行拦截并做一些修改。</p>
+
+<p>这里还hook了ActivityThread的mH类的Callback，暂不赘述。</p>
+
+<p>刚才说了，可以通过Instrumentation的execStartActivity方法进行偷梁换柱，所以我们直接看对应的方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">public</span> ActivityResult <span class="hljs-title">execStartActivity</span>(
+        Context who, IBinder contextThread, IBinder token, Activity target,
+        Intent intent, <span class="hljs-keyword">int</span> requestCode, Bundle options) {
+    mPluginManager.getComponentsHandler().transformIntentToExplicitAsNeeded(intent);
+    <span class="hljs-comment">// null component is an implicitly intent</span>
+    <span class="hljs-keyword">if</span> (intent.getComponent() != <span class="hljs-keyword">null</span>) {
+        Log.i(TAG, String.format(<span class="hljs-string">"execStartActivity[%s : %s]"</span>, intent.getComponent().getPackageName(),
+                intent.getComponent().getClassName()));
+        <span class="hljs-comment">// resolve intent with Stub Activity if needed</span>
+        <span class="hljs-keyword">this</span>.mPluginManager.getComponentsHandler().markIntentIfNeeded(intent);
+    }
+
+    ActivityResult result = realExecStartActivity(who, contextThread, token, target,
+                intent, requestCode, options);
+
+    <span class="hljs-keyword">return</span> result;
+
+}
+</code></pre>
+
+<p>首先调用transformIntentToExplicitAsNeeded，这个主要是当component为null时，根据启动Activity时，配置的action，data,category等去已加载的plugin中匹配到确定的Activity的。</p>
+
+<p>本例我们的写法ComponentName肯定不为null，所以直接看<code>markIntentIfNeeded()</code>方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">markIntentIfNeeded</span>(Intent intent) {
+    <span class="hljs-keyword">if</span> (intent.getComponent() == <span class="hljs-keyword">null</span>) {
+        <span class="hljs-keyword">return</span>;
+    }
+
+    String targetPackageName = intent.getComponent().getPackageName();
+    String targetClassName = intent.getComponent().getClassName();
+    <span class="hljs-comment">// search map and return specific launchmode stub activity</span>
+    <span class="hljs-keyword">if</span> (!targetPackageName.equals(mContext.getPackageName())
+            &amp;&amp; mPluginManager.getLoadedPlugin(targetPackageName) != <span class="hljs-keyword">null</span>) {
+        intent.putExtra(Constants.KEY_IS_PLUGIN, <span class="hljs-keyword">true</span>);
+        intent.putExtra(Constants.KEY_TARGET_PACKAGE, targetPackageName);
+        intent.putExtra(Constants.KEY_TARGET_ACTIVITY, targetClassName);
+        dispatchStubActivity(intent);
+    }
+}</code></pre>
+
+<p>在该方法中判断如果启动的是插件中类，则将启动的包名和Activity类名存到了intent中，可以看到这里存储明显是为了后面恢复用的。</p>
+
+<p>然后调用了<code>dispatchStubActivity(intent)</code></p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">dispatchStubActivity</span>(Intent intent) {
+    ComponentName component = intent.getComponent();
+    String targetClassName = intent.getComponent().getClassName();
+    LoadedPlugin loadedPlugin = mPluginManager.getLoadedPlugin(intent);
+    ActivityInfo info = loadedPlugin.getActivityInfo(component);
+    <span class="hljs-keyword">if</span> (info == <span class="hljs-keyword">null</span>) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"can not find "</span> + component);
+    }
+    <span class="hljs-keyword">int</span> launchMode = info.launchMode;
+    Resources.Theme themeObj = loadedPlugin.getResources().newTheme();
+    themeObj.applyStyle(info.theme, <span class="hljs-keyword">true</span>);
+    String stubActivity = mStubActivityInfo.getStubActivity(targetClassName, launchMode, themeObj);
+    Log.i(TAG, String.format(<span class="hljs-string">"dispatchStubActivity,[%s -&gt; %s]"</span>, targetClassName, stubActivity));
+    intent.setClassName(mContext, stubActivity);
+}</code></pre>
+
+<p>可以直接看最后一行，intent通过setClassName替换启动的目标Activity了！这个stubActivity是由<code>mStubActivityInfo.getStubActivity(targetClassName, launchMode, themeObj)</code>返回。</p>
+
+<p>很明显，传入的参数launchMode、themeObj都是决定选择哪一个占坑类用的。</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">public</span> String <span class="hljs-title">getStubActivity</span>(String className, <span class="hljs-keyword">int</span> launchMode, Theme theme) {
+    String stubActivity= mCachedStubActivity.get(className);
+    <span class="hljs-keyword">if</span> (stubActivity != <span class="hljs-keyword">null</span>) {
+        <span class="hljs-keyword">return</span> stubActivity;
+    }
+
+    TypedArray array = theme.obtainStyledAttributes(<span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[]{
+            android.R.attr.windowIsTranslucent,
+            android.R.attr.windowBackground
+    });
+    <span class="hljs-keyword">boolean</span> windowIsTranslucent = array.getBoolean(<span class="hljs-number">0</span>, <span class="hljs-keyword">false</span>);
+    array.recycle();
+    <span class="hljs-keyword">if</span> (Constants.DEBUG) {
+        Log.d(<span class="hljs-string">"StubActivityInfo"</span>, <span class="hljs-string">"getStubActivity, is transparent theme ? "</span> + windowIsTranslucent);
+    }
+    stubActivity = String.format(STUB_ACTIVITY_STANDARD, corePackage, usedStandardStubActivity);
+    <span class="hljs-keyword">switch</span> (launchMode) {
+        <span class="hljs-keyword">case</span> ActivityInfo.LAUNCH_MULTIPLE: {
+            stubActivity = String.format(STUB_ACTIVITY_STANDARD, corePackage, usedStandardStubActivity);
+            <span class="hljs-keyword">if</span> (windowIsTranslucent) {
+                stubActivity = String.format(STUB_ACTIVITY_STANDARD, corePackage, <span class="hljs-number">2</span>);
+            }
+            <span class="hljs-keyword">break</span>;
+        }
+        <span class="hljs-keyword">case</span> ActivityInfo.LAUNCH_SINGLE_TOP: {
+            usedSingleTopStubActivity = usedSingleTopStubActivity % MAX_COUNT_SINGLETOP + <span class="hljs-number">1</span>;
+            stubActivity = String.format(STUB_ACTIVITY_SINGLETOP, corePackage, usedSingleTopStubActivity);
+            <span class="hljs-keyword">break</span>;
+        }
+
+       <span class="hljs-comment">// 省略LAUNCH_SINGLE_TASK，LAUNCH_SINGLE_INSTANCE</span>
+    }
+
+    mCachedStubActivity.put(className, stubActivity);
+    <span class="hljs-keyword">return</span> stubActivity;
+}</code></pre>
+
+<p>可以看到主要就是根据launchMode去选择不同的占坑类。 <br>
+例如：</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs fix"><span class="hljs-attribute">stubActivity </span>=<span class="hljs-string"> String.format(STUB_ACTIVITY_STANDARD, corePackage, usedStandardStubActivity);</span></code></pre>
+
+<p><code>STUB_ACTIVITY_STANDARD值为："%s.A$%d"</code>, corePackage值为<code>com.didi.virtualapk.core</code>，usedStandardStubActivity为数字值。</p>
+
+<p>所以最终类名格式为：<code>com.didi.virtualapk.core.A$1</code></p>
+
+<p>再看一眼，CoreLibrary下的AndroidManifest中：</p>
+
+
+
+<pre class="prettyprint"><code class="language-xml hljs "><span class="hljs-tag">&lt;<span class="hljs-title">activity</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">".A$1"</span> <span class="hljs-attribute">android:launchMode</span>=<span class="hljs-value">"standard"</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">activity</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">".A$2"</span> <span class="hljs-attribute">android:launchMode</span>=<span class="hljs-value">"standard"</span>
+    <span class="hljs-attribute">android:theme</span>=<span class="hljs-value">"@android:style/Theme.Translucent"</span> /&gt;</span>
+
+<span class="hljs-comment">&lt;!-- Stub Activities --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">activity</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">".B$1"</span> <span class="hljs-attribute">android:launchMode</span>=<span class="hljs-value">"singleTop"</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">activity</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">".B$2"</span> <span class="hljs-attribute">android:launchMode</span>=<span class="hljs-value">"singleTop"</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">activity</span> <span class="hljs-attribute">android:name</span>=<span class="hljs-value">".B$3"</span> <span class="hljs-attribute">android:launchMode</span>=<span class="hljs-value">"singleTop"</span>/&gt;</span>
+// 省略很多...    </code></pre>
+
+<p>就完全明白了。</p>
+
+<p>到这里就可以看到，替换我们启动的Activity为占坑Activity，将我们原本启动的包名，类名存储到了Intent中。</p>
+
+<p>这样做只完成了一半，为什么这么说呢？</p>
+
+
+
+<h3 id="2-还原activity">(2) 还原Activity</h3>
+
+<p>因为欺骗过了AMS，AMS执行完成后，最终要启动的不可能是占坑Activity，还应该是我们的启动的目标Activity呀。</p>
+
+<p>这里需要知道Activity的启动流程：</p>
+
+<p>AMS在处理完启动Activity后，会调用：<code>app.thread.scheduleLaunchActivity</code>，这里的thread对应的server端未我们ActivityThread中的ApplicationThread对象(binder可以理解有一个client端和一个server端)，所以会调用<code>ApplicationThread.scheduleLaunchActivity</code>方法，在其内部会调用mH类的sendMessage方法，传递的标识为<code>H.LAUNCH_ACTIVITY</code>，进入调用到ActivityThread的handleLaunchActivity方法-&gt;ActivityThread#handleLaunchActivity-&gt;mInstrumentation.newActivity()。</p>
+
+<blockquote>
+  <p>ps:这里流程不清楚没关系，暂时理解为最终会回调到Instrumentation的newActivity方法即可，细节可以自己去查看结合老罗的blog理解。</p>
+</blockquote>
+
+<p>关键的来了，最终又到了Instrumentation的newActivity方法，还记得这个类我们已经改为VAInstrumentation啦：</p>
+
+<p>直接看其newActivity方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> Activity <span class="hljs-title">newActivity</span>(ClassLoader cl, String className, Intent intent) <span class="hljs-keyword">throws</span> InstantiationException, IllegalAccessException, ClassNotFoundException {
+    <span class="hljs-keyword">try</span> {
+        cl.loadClass(className);
+    } <span class="hljs-keyword">catch</span> (ClassNotFoundException e) {
+        LoadedPlugin plugin = <span class="hljs-keyword">this</span>.mPluginManager.getLoadedPlugin(intent);
+        String targetClassName = PluginUtil.getTargetActivity(intent);
+
+        <span class="hljs-keyword">if</span> (targetClassName != <span class="hljs-keyword">null</span>) {
+            Activity activity = mBase.newActivity(plugin.getClassLoader(), targetClassName, intent);
+            activity.setIntent(intent);
+
+          <span class="hljs-comment">// 省略兼容性处理代码</span>
+            <span class="hljs-keyword">return</span> activity;
+        }
+    }
+
+    <span class="hljs-keyword">return</span> mBase.newActivity(cl, className, intent);
+}
+</code></pre>
+
+<p>核心就是首先从intent中取出我们的目标Activity，然后通过plugin的ClassLoader去加载（还记得在加载插件时，会生成一个LoadedPlugin对象，其中会对应其初始化一个DexClassLoader）。</p>
+
+<p>这样就完成了Activity的“偷梁换柱”。</p>
+
+<p>还没完，接下来在<code>callActivityOnCreate</code>方法中：</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs avrasm"> @Override
+public void callActivityOnCreate(Activity activity, Bundle icicle) {
+    final Intent intent = activity<span class="hljs-preprocessor">.getIntent</span>()<span class="hljs-comment">;</span>
+    if (PluginUtil<span class="hljs-preprocessor">.isIntentFromPlugin</span>(intent)) {
+        Context base = activity<span class="hljs-preprocessor">.getBaseContext</span>()<span class="hljs-comment">;</span>
+        try {
+            LoadedPlugin plugin = this<span class="hljs-preprocessor">.mPluginManager</span><span class="hljs-preprocessor">.getLoadedPlugin</span>(intent)<span class="hljs-comment">;</span>
+            ReflectUtil<span class="hljs-preprocessor">.setField</span>(base<span class="hljs-preprocessor">.getClass</span>(), base, <span class="hljs-string">"mResources"</span>, plugin<span class="hljs-preprocessor">.getResources</span>())<span class="hljs-comment">;</span>
+            ReflectUtil<span class="hljs-preprocessor">.setField</span>(ContextWrapper<span class="hljs-preprocessor">.class</span>, activity, <span class="hljs-string">"mBase"</span>, plugin<span class="hljs-preprocessor">.getPluginContext</span>())<span class="hljs-comment">;</span>
+            ReflectUtil<span class="hljs-preprocessor">.setField</span>(Activity<span class="hljs-preprocessor">.class</span>, activity, <span class="hljs-string">"mApplication"</span>, plugin<span class="hljs-preprocessor">.getApplication</span>())<span class="hljs-comment">;</span>
+            ReflectUtil<span class="hljs-preprocessor">.setFieldNoException</span>(ContextThemeWrapper<span class="hljs-preprocessor">.class</span>, activity, <span class="hljs-string">"mBase"</span>, plugin<span class="hljs-preprocessor">.getPluginContext</span>())<span class="hljs-comment">;</span>
+
+            // <span class="hljs-keyword">set</span> screenOrientation
+            ActivityInfo activityInfo = plugin<span class="hljs-preprocessor">.getActivityInfo</span>(PluginUtil<span class="hljs-preprocessor">.getComponent</span>(intent))<span class="hljs-comment">;</span>
+            if (activityInfo<span class="hljs-preprocessor">.screenOrientation</span> != ActivityInfo<span class="hljs-preprocessor">.SCREEN</span>_ORIENTATION_UNSPECIFIED) {
+                activity<span class="hljs-preprocessor">.setRequestedOrientation</span>(activityInfo<span class="hljs-preprocessor">.screenOrientation</span>)<span class="hljs-comment">;</span>
+            }
+        } catch (Exception e) {
+            e<span class="hljs-preprocessor">.printStackTrace</span>()<span class="hljs-comment">;</span>
+        }
+
+    }
+
+    mBase<span class="hljs-preprocessor">.callActivityOnCreate</span>(activity, icicle)<span class="hljs-comment">;</span>
+}</code></pre>
+
+<p>设置了修改了mResources、mBase（Context）、mApplication对象。以及设置一些可动态设置的属性，这里仅设置了屏幕方向。</p>
+
+<p>这里提一下，将mBase替换为PluginContext，可以修改Resources、AssetManager以及拦截相当多的操作。</p>
+
+<p>看一眼代码就清楚了：</p>
+
+<p>原本Activity的部分get操作</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "># ContextWrapper
+<span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> AssetManager <span class="hljs-title">getAssets</span>() {
+    <span class="hljs-keyword">return</span> mBase.getAssets();
+}
+
+<span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> Resources <span class="hljs-title">getResources</span>()
+{
+    <span class="hljs-keyword">return</span> mBase.getResources();
+}
+
+<span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> PackageManager <span class="hljs-title">getPackageManager</span>() {
+    <span class="hljs-keyword">return</span> mBase.getPackageManager();
+}
+
+<span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> ContentResolver <span class="hljs-title">getContentResolver</span>() {
+    <span class="hljs-keyword">return</span> mBase.getContentResolver();
+}</code></pre>
+
+<p>直接替换为：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "># PluginContext
+
+<span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> Resources <span class="hljs-title">getResources</span>() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.mPlugin.getResources();
+}
+
+<span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> AssetManager <span class="hljs-title">getAssets</span>() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.mPlugin.getAssets();
+}
+
+<span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> ContentResolver <span class="hljs-title">getContentResolver</span>() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> PluginContentResolver(getHostContext());
+}
+</code></pre>
+
+<p>看得出来还是非常巧妙的。可以做的事情也非常多，后面对ContentProvider的描述也会提现出来。</p>
+
+<p>好了，到此Activity就可以正常启动了。</p>
+
+<p>下面看Service。</p>
+
+
+
+<h2 id="三service的支持">三、Service的支持</h2>
+
+<p>Service和Activity有点不同，显而易见的首先我们也会将要启动的Service类替换为占坑的Service类，但是有一点不同，在Standard模式下多次启动同一个占坑Activity会创建多个对象来对象我们的目标类。而Service多次启动只会调用onStartCommond方法，甚至常规多次调用bindService，seviceConn对象不变，甚至都不会多次回调bindService方法（多次调用可以通过给Intent设置不同Action解决）。</p>
+
+<p>还有一点，最明显的差异是，Activity的生命周期是由用户交互决定的，而Service的声明周期是我们主动通过代码调用的。</p>
+
+<p>也就是说，start、stop、bind、unbind都是我们显示调用的，所以我们可以拦截这几个方法，做一些事情。</p>
+
+<p>Virtual Apk的做法，即将所有的操作进行拦截，都改为startService，然后统一在onStartCommond中分发。</p>
+
+<p>下面看详细代码：</p>
+
+
+
+<h3 id="1-hook-iactivitymanager">(1) hook IActivityManager</h3>
+
+<p>再次来到PluginManager，发下如下方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">hookSystemServices</span>() {
+    <span class="hljs-keyword">try</span> {
+        Singleton&lt;IActivityManager&gt; defaultSingleton = (Singleton&lt;IActivityManager&gt;) ReflectUtil.getField(ActivityManagerNative.class, <span class="hljs-keyword">null</span>, <span class="hljs-string">"gDefault"</span>);
+        IActivityManager activityManagerProxy = ActivityManagerProxy.newInstance(<span class="hljs-keyword">this</span>, defaultSingleton.get());
+
+        <span class="hljs-comment">// Hook IActivityManager from ActivityManagerNative</span>
+        ReflectUtil.setField(defaultSingleton.getClass().getSuperclass(), defaultSingleton, <span class="hljs-string">"mInstance"</span>, activityManagerProxy);
+
+        <span class="hljs-keyword">if</span> (defaultSingleton.get() == activityManagerProxy) {
+            <span class="hljs-keyword">this</span>.mActivityManager = activityManagerProxy;
+        }
+    } <span class="hljs-keyword">catch</span> (Exception e) {
+        e.printStackTrace();
+    }
+}</code></pre>
+
+<p>首先拿到ActivityManagerNative中的gDefault对象，该对象返回的是一个<code>Singleton&lt;IActivityManager&gt;</code>,然后拿到其mInstance对象，即IActivityManager对象（可以理解为和AMS交互的binder的client对象）对象。</p>
+
+<p>然后通过动态代理的方式，替换为了一个代理对象。</p>
+
+<p>那么重点看对应的InvocationHandler对象即可，该代理对象调用的方法都会辗转到其invoke方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> Object <span class="hljs-title">invoke</span>(Object proxy, Method method, Object[] args) <span class="hljs-keyword">throws</span> Throwable {
+    <span class="hljs-keyword">if</span> (<span class="hljs-string">"startService"</span>.equals(method.getName())) {
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-keyword">return</span> startService(proxy, method, args);
+        } <span class="hljs-keyword">catch</span> (Throwable e) {
+            Log.e(TAG, <span class="hljs-string">"Start service error"</span>, e);
+        }
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">"stopService"</span>.equals(method.getName())) {
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-keyword">return</span> stopService(proxy, method, args);
+        } <span class="hljs-keyword">catch</span> (Throwable e) {
+            Log.e(TAG, <span class="hljs-string">"Stop Service error"</span>, e);
+        }
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">"stopServiceToken"</span>.equals(method.getName())) {
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-keyword">return</span> stopServiceToken(proxy, method, args);
+        } <span class="hljs-keyword">catch</span> (Throwable e) {
+            Log.e(TAG, <span class="hljs-string">"Stop service token error"</span>, e);
+        }
+    }
+    <span class="hljs-comment">// 省略bindService，unbindService等方法</span>
+}    
+</code></pre>
+
+<p>当我们调用startService时，跟进代码，可以发现调用流程为：</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs haskell"><span class="hljs-title">startService</span>-&gt;startServiceCommon-&gt;<span class="hljs-type">ActivityManagerNative</span>.getDefault().startService</code></pre>
+
+<p>这个getDefault刚被我们hook，所以会被上述方法拦截，然后调用：<code>startService(proxy, method, args)</code></p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">private</span> Object <span class="hljs-title">startService</span>(Object proxy, Method method, Object[] args) <span class="hljs-keyword">throws</span> Throwable {
+    IApplicationThread appThread = (IApplicationThread) args[<span class="hljs-number">0</span>];
+    Intent target = (Intent) args[<span class="hljs-number">1</span>];
+    ResolveInfo resolveInfo = <span class="hljs-keyword">this</span>.mPluginManager.resolveService(target, <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">null</span> == resolveInfo || <span class="hljs-keyword">null</span> == resolveInfo.serviceInfo) {
+        <span class="hljs-comment">// is host service</span>
+        <span class="hljs-keyword">return</span> method.invoke(<span class="hljs-keyword">this</span>.mActivityManager, args);
+    }
+
+    <span class="hljs-keyword">return</span> startDelegateServiceForTarget(target, resolveInfo.serviceInfo, <span class="hljs-keyword">null</span>, RemoteService.EXTRA_COMMAND_START_SERVICE);
+}
+</code></pre>
+
+<p>先不看代码，考虑下我们这里唯一要做的就是通过Intent保存关键数据，替换启动的Service类为占坑类。</p>
+
+<p>所以直接看最后的方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">private</span> ComponentName <span class="hljs-title">startDelegateServiceForTarget</span>(Intent target,
+                                                    ServiceInfo serviceInfo,
+                                                    Bundle extras, <span class="hljs-keyword">int</span> command) {
+    Intent wrapperIntent = wrapperTargetIntent(target, serviceInfo, extras, command);
+    <span class="hljs-keyword">return</span> mPluginManager.getHostContext().startService(wrapperIntent);
+}</code></pre>
+
+<p>最后一行就是启动了，那么替换的操作应该在wrapperTargetIntent中完成：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">private</span> Intent <span class="hljs-title">wrapperTargetIntent</span>(Intent target, ServiceInfo serviceInfo, Bundle extras, <span class="hljs-keyword">int</span> command) {
+    <span class="hljs-comment">// fill in service with ComponentName</span>
+    target.setComponent(<span class="hljs-keyword">new</span> ComponentName(serviceInfo.packageName, serviceInfo.name));
+    String pluginLocation = mPluginManager.getLoadedPlugin(target.getComponent()).getLocation();
+
+    <span class="hljs-comment">// start delegate service to run plugin service inside</span>
+    <span class="hljs-keyword">boolean</span> local = PluginUtil.isLocalService(serviceInfo);
+    Class&lt;? extends Service&gt; delegate = local ? LocalService.class : RemoteService.class;
+    Intent intent = <span class="hljs-keyword">new</span> Intent();
+    intent.setClass(mPluginManager.getHostContext(), delegate);
+    intent.putExtra(RemoteService.EXTRA_TARGET, target);
+    intent.putExtra(RemoteService.EXTRA_COMMAND, command);
+    intent.putExtra(RemoteService.EXTRA_PLUGIN_LOCATION, pluginLocation);
+    <span class="hljs-keyword">if</span> (extras != <span class="hljs-keyword">null</span>) {
+        intent.putExtras(extras);
+    }
+
+    <span class="hljs-keyword">return</span> intent;
+}</code></pre>
+
+<p>果不其然，重新初始化了Intent，设置了目标类为LocalService（多进程时设置为RemoteService），然后将原本的Intent存储到<code>EXTRA_TARGET</code>，携带command为<code>EXTRA_COMMAND_START_SERVICE</code>，以及插件apk路径。</p>
+
+
+
+<h3 id="2代理分发">（2）代理分发</h3>
+
+<p>那么接下来代码就到了LocalService的onStartCommond中啦：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs ">
+<span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">onStartCommand</span>(Intent intent, <span class="hljs-keyword">int</span> flags, <span class="hljs-keyword">int</span> startId) {
+    <span class="hljs-comment">// 省略一些代码...</span>
+
+    Intent target = intent.getParcelableExtra(EXTRA_TARGET);
+    <span class="hljs-keyword">int</span> command = intent.getIntExtra(EXTRA_COMMAND, <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">null</span> == target || command &lt;= <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">return</span> START_STICKY;
+    }
+
+    ComponentName component = target.getComponent();
+    LoadedPlugin plugin = mPluginManager.getLoadedPlugin(component);
+
+    <span class="hljs-keyword">switch</span> (command) {
+        <span class="hljs-keyword">case</span> EXTRA_COMMAND_START_SERVICE: {
+            ActivityThread mainThread = (ActivityThread)ReflectUtil.getActivityThread(getBaseContext());
+            IApplicationThread appThread = mainThread.getApplicationThread();
+            Service service;
+
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.mPluginManager.getComponentsHandler().isServiceAvailable(component)) {
+                service = <span class="hljs-keyword">this</span>.mPluginManager.getComponentsHandler().getService(component);
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">try</span> {
+                    service = (Service) plugin.getClassLoader().loadClass(component.getClassName()).newInstance();
+
+                    Application app = plugin.getApplication();
+                    IBinder token = appThread.asBinder();
+                    Method attach = service.getClass().getMethod(<span class="hljs-string">"attach"</span>, Context.class, ActivityThread.class, String.class, IBinder.class, Application.class, Object.class);
+                    IActivityManager am = mPluginManager.getActivityManager();
+
+                    attach.invoke(service, plugin.getPluginContext(), mainThread, component.getClassName(), token, app, am);
+                    service.onCreate();
+                    <span class="hljs-keyword">this</span>.mPluginManager.getComponentsHandler().rememberService(component, service);
+                } <span class="hljs-keyword">catch</span> (Throwable t) {
+                    <span class="hljs-keyword">return</span> START_STICKY;
+                }
+            }
+
+            service.onStartCommand(target, <span class="hljs-number">0</span>, <span class="hljs-keyword">this</span>.mPluginManager.getComponentsHandler().getServiceCounter(service).getAndIncrement());
+            <span class="hljs-keyword">break</span>;
+        }
+        <span class="hljs-comment">// 省略下面的代码</span>
+         <span class="hljs-keyword">case</span> EXTRA_COMMAND_BIND_SERVICE:<span class="hljs-keyword">break</span>;
+         <span class="hljs-keyword">case</span> EXTRA_COMMAND_STOP_SERVICE:<span class="hljs-keyword">break</span>;
+         <span class="hljs-keyword">case</span> EXTRA_COMMAND_UNBIND_SERVICE:<span class="hljs-keyword">break</span>;
+}</code></pre>
+
+<p>这里代码很简单了，根据command类型，比如<code>EXTRA_COMMAND_START_SERVICE</code>，直接通过plugin的ClassLoader去load目标Service的class，然后反射创建实例。比较重要的是，Service创建好后，需要调用它的attach方法，这里凑够参数，然后反射调用即可，最后调用onCreate、onStartCommand收工。然后将其保存起来，stop的时候取出来调用其onDestroy即可。</p>
+
+<p>bind、unbind以及stop的代码与上述基本一致，不在赘述。</p>
+
+<p>唯一提醒的就是，刚才看到还hook了一个方法叫做：<code>stopServiceToken</code>，该方法是什么时候用的呢？</p>
+
+<p>主要有一些特殊的Service，比如IntentService，其stopSelf是由自身调用的，最终会调用<code>mActivityManager.stopServiceToken</code>方法，同样的中转为STOP操作即可。</p>
+
+
+
+<h2 id="四broadcastreceiver的支持">四、BroadcastReceiver的支持</h2>
+
+<p>这个比较简单，直接解析Manifest后，静态转动态即可。</p>
+
+<p>相关代码在LoadedPlugin的构造方法中：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">for</span> (PackageParser.Activity receiver : <span class="hljs-keyword">this</span>.mPackage.receivers) {
+    receivers.put(receiver.getComponentName(), receiver.info);
+
+    <span class="hljs-keyword">try</span> {
+        BroadcastReceiver br = BroadcastReceiver.class.cast(getClassLoader().loadClass(receiver.getComponentName().getClassName()).newInstance());
+        <span class="hljs-keyword">for</span> (PackageParser.ActivityIntentInfo aii : receiver.intents) {
+            <span class="hljs-keyword">this</span>.mHostContext.registerReceiver(br, aii);
+        }
+    } <span class="hljs-keyword">catch</span> (Exception e) {
+        e.printStackTrace();
+    }
+}</code></pre>
+
+<p>可以看到解析到receiver信息后，直接通过pluginClassloader去loadClass拿到receiver对象，然后调用this.mHostContext.registerReceiver即可。</p>
+
+<p>开心，最后一个了~</p>
+
+
+
+<h2 id="五contentprovider的支持">五、ContentProvider的支持</h2>
+
+
+
+<h3 id="1hook-icontentprovider">（1）hook IContentProvider</h3>
+
+<p>ContentProvider的支持依然是通过代理分发。</p>
+
+<p>看一段CP使用的代码：</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs javascript">Cursor bookCursor = getContentResolver().query(bookUri, <span class="hljs-keyword">new</span> <span class="hljs-built_in">String</span>[]{<span class="hljs-string">"_id"</span>, <span class="hljs-string">"name"</span>}, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);
+</code></pre>
+
+<p>这里用到了PluginContext，在生成Activity、Service的时候，为其设置的Context都为PluginContext对象。</p>
+
+<p>所以当你调用getContentResolver时，调用的为PluginContext的getContentResolver。</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> ContentResolver <span class="hljs-title">getContentResolver</span>() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> PluginContentResolver(getHostContext());
+}</code></pre>
+
+<p>返回的是一个PluginContentResolver对象，当我们调用query方法时，会辗转调用到 <br>
+<code>ContentResolver.acquireUnstableProvider</code>方法。该方法被PluginContentResolver中复写:</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">protected</span> IContentProvider <span class="hljs-title">acquireUnstableProvider</span>(Context context, String auth) {
+    <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">if</span> (mPluginManager.resolveContentProvider(auth, <span class="hljs-number">0</span>) != <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">return</span> mPluginManager.getIContentProvider();
+        }
+
+        <span class="hljs-keyword">return</span> (IContentProvider) sAcquireUnstableProvider.invoke(mBase, context, auth);
+    } <span class="hljs-keyword">catch</span> (Exception e) {
+        e.printStackTrace();
+    }
+
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+}</code></pre>
+
+<p>如果调用的auth为插件apk中的provider，则直接返回<code>mPluginManager.getIContentProvider()</code>。</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> IContentProvider <span class="hljs-title">getIContentProvider</span>() {
+    <span class="hljs-keyword">if</span> (mIContentProvider == <span class="hljs-keyword">null</span>) {
+        hookIContentProviderAsNeeded();
+    }
+
+    <span class="hljs-keyword">return</span> mIContentProvider;
+}</code></pre>
+
+<p>咦，又看到一个hook方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">hookIContentProviderAsNeeded</span>() {
+    Uri uri = Uri.parse(PluginContentResolver.getUri(mContext));
+    mContext.getContentResolver().call(uri, <span class="hljs-string">"wakeup"</span>, <span class="hljs-keyword">null</span>, <span class="hljs-keyword">null</span>);
+    <span class="hljs-keyword">try</span> {
+        Field authority = <span class="hljs-keyword">null</span>;
+        Field mProvider = <span class="hljs-keyword">null</span>;
+        ActivityThread activityThread = (ActivityThread) ReflectUtil.getActivityThread(mContext);
+        Map mProviderMap = (Map) ReflectUtil.getField(activityThread.getClass(), activityThread, <span class="hljs-string">"mProviderMap"</span>);
+        Iterator iter = mProviderMap.entrySet().iterator();
+        <span class="hljs-keyword">while</span> (iter.hasNext()) {
+            Map.Entry entry = (Map.Entry) iter.next();
+            Object key = entry.getKey();
+            Object val = entry.getValue();
+            String auth;
+            <span class="hljs-keyword">if</span> (key <span class="hljs-keyword">instanceof</span> String) {
+                auth = (String) key;
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">if</span> (authority == <span class="hljs-keyword">null</span>) {
+                    authority = key.getClass().getDeclaredField(<span class="hljs-string">"authority"</span>);
+                    authority.setAccessible(<span class="hljs-keyword">true</span>);
+                }
+                auth = (String) authority.get(key);
+            }
+            <span class="hljs-keyword">if</span> (auth.equals(PluginContentResolver.getAuthority(mContext))) {
+                <span class="hljs-keyword">if</span> (mProvider == <span class="hljs-keyword">null</span>) {
+                    mProvider = val.getClass().getDeclaredField(<span class="hljs-string">"mProvider"</span>);
+                    mProvider.setAccessible(<span class="hljs-keyword">true</span>);
+                }
+                IContentProvider rawProvider = (IContentProvider) mProvider.get(val);
+                IContentProvider proxy = IContentProviderProxy.newInstance(mContext, rawProvider);
+                mIContentProvider = proxy;
+                Log.d(TAG, <span class="hljs-string">"hookIContentProvider succeed : "</span> + mIContentProvider);
+                <span class="hljs-keyword">break</span>;
+            }
+        }
+    } <span class="hljs-keyword">catch</span> (Exception e) {
+        e.printStackTrace();
+    }
+}
+</code></pre>
+
+<p>前两行比较重要，第一行是拿到了占坑的provider的uri，然后主动调用了其call方法。 <br>
+如果你跟进去，会发现，其会调用acquireProvider-&gt;mMainThread.acquireProvider-&gt;ActivityManagerNative.getDefault().getContentProvider-&gt;installProvider。简单来说，其首先调用已经注册provider，得到返回的IContentProvider对象。</p>
+
+<p>这个IContentProvider对象是在ActivityThread.installProvider方法中加入到mProviderMap中。</p>
+
+<p>而ActivityThread对象又容易获取，mProviderMap又是它成员变量，那么也容易获取，所以上面的一大坨（除了前两行）代码，就为了拿到占坑的provider对应的IContentProvider对象。</p>
+
+<p>然后通过动态代理的方式，进行了hook，关注InvocationHandler的实例IContentProviderProxy。</p>
+
+<p>IContentProvider能干吗呢？其实就能拦截我们正常的query、insert、update、delete等操作。</p>
+
+<p>拦截这些方法干嘛？</p>
+
+<p>当然是修改uri啦，把用户调用的uri，替换为占坑provider的uri，再把原本的uri作为参数拼接在占坑provider的uri后面即可。</p>
+
+<p>好了，直接看invoke方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> Object <span class="hljs-title">invoke</span>(Object proxy, Method method, Object[] args) <span class="hljs-keyword">throws</span> Throwable {
+    Log.v(TAG, method.toGenericString() + <span class="hljs-string">" : "</span> + Arrays.toString(args));
+    wrapperUri(method, args);
+
+    <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">return</span> method.invoke(mBase, args);
+    } <span class="hljs-keyword">catch</span> (InvocationTargetException e) {
+        <span class="hljs-keyword">throw</span> e.getTargetException();
+    }
+}</code></pre>
+
+<p>直接看wrapperUri</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">wrapperUri</span>(Method method, Object[] args) {
+    Uri uri = <span class="hljs-keyword">null</span>;
+    <span class="hljs-keyword">int</span> index = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">if</span> (args != <span class="hljs-keyword">null</span>) {
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; args.length; i++) {
+            <span class="hljs-keyword">if</span> (args[i] <span class="hljs-keyword">instanceof</span> Uri) {
+                uri = (Uri) args[i];
+                index = i;
+                <span class="hljs-keyword">break</span>;
+            }
+        }
+    }
+
+    <span class="hljs-comment">// 省略部分代码</span>
+
+    PluginManager pluginManager = PluginManager.getInstance(mContext);
+    ProviderInfo info = pluginManager.resolveContentProvider(uri.getAuthority(), <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">if</span> (info != <span class="hljs-keyword">null</span>) {
+        String pkg = info.packageName;
+        LoadedPlugin plugin = pluginManager.getLoadedPlugin(pkg);
+        String pluginUri = Uri.encode(uri.toString());
+        StringBuilder builder = <span class="hljs-keyword">new</span> StringBuilder(PluginContentResolver.getUri(mContext));
+        builder.append(<span class="hljs-string">"/?plugin="</span> + plugin.getLocation());
+        builder.append(<span class="hljs-string">"&amp;pkg="</span> + pkg);
+        builder.append(<span class="hljs-string">"&amp;uri="</span> + pluginUri);
+        Uri wrapperUri = Uri.parse(builder.toString());
+        <span class="hljs-keyword">if</span> (method.getName().equals(<span class="hljs-string">"call"</span>)) {
+            bundleInCallMethod.putString(KEY_WRAPPER_URI, wrapperUri.toString());
+        } <span class="hljs-keyword">else</span> {
+            args[index] = wrapperUri;
+        }
+    }
+}</code></pre>
+
+<p>从参数中找到uri，往下看，搞了个StringBuilder首先加入占坑provider的uri，然后将目标uri，pkg,plugin等参数等拼接上去，替换到args中的uri，然后继续走原本的流程。</p>
+
+<p>假设是query方法，应该就到达我们占坑provider的query方法啦。</p>
+
+
+
+<h3 id="2代理分发-1">（2）代理分发</h3>
+
+<p>占坑如下：</p>
+
+
+
+<pre class="prettyprint"><code class="language-xml hljs "><span class="hljs-tag">&lt;<span class="hljs-title">provider
+</span>    <span class="hljs-attribute">android:name</span>=<span class="hljs-value">"com.didi.virtualapk.delegate.RemoteContentProvider"</span>
+    <span class="hljs-attribute">android:authorities</span>=<span class="hljs-value">"${applicationId}.VirtualAPK.Provider"</span>
+    <span class="hljs-attribute">android:process</span>=<span class="hljs-value">":daemon"</span> /&gt;</span></code></pre>
+
+<p>打开RemoteContentProvider，直接看query方法：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-annotation">@Override</span>
+<span class="hljs-keyword">public</span> Cursor <span class="hljs-title">query</span>(Uri uri, String[] projection, String selection,
+                    String[] selectionArgs, String sortOrder) {
+
+    ContentProvider provider = getContentProvider(uri);
+    Uri pluginUri = Uri.parse(uri.getQueryParameter(KEY_URI));
+    <span class="hljs-keyword">if</span> (provider != <span class="hljs-keyword">null</span>) {
+        <span class="hljs-keyword">return</span> provider.query(pluginUri, projection, selection, selectionArgs, sortOrder);
+    }
+
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+}</code></pre>
+
+<p>可以看到通过传入的生成了一个新的provider,然后拿到目标uri，在直接调用provider.query传入目标uri即可。</p>
+
+<p>那么这个provider实际上是这个代理类帮我们生成的：</p>
+
+
+
+<pre class="prettyprint"><code class="language-java hljs "><span class="hljs-keyword">private</span> ContentProvider <span class="hljs-title">getContentProvider</span>(<span class="hljs-keyword">final</span> Uri uri) {
+    <span class="hljs-keyword">final</span> PluginManager pluginManager = PluginManager.getInstance(getContext());
+    Uri pluginUri = Uri.parse(uri.getQueryParameter(KEY_URI));
+    <span class="hljs-keyword">final</span> String auth = pluginUri.getAuthority();
+    <span class="hljs-comment">// 省略了缓存管理</span>
+    LoadedPlugin plugin = pluginManager.getLoadedPlugin(uri.getQueryParameter(KEY_PKG));
+    <span class="hljs-keyword">if</span> (plugin == <span class="hljs-keyword">null</span>) {
+        <span class="hljs-keyword">try</span> {
+            pluginManager.loadPlugin(<span class="hljs-keyword">new</span> File(uri.getQueryParameter(KEY_PLUGIN)));
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    <span class="hljs-keyword">final</span> ProviderInfo providerInfo = pluginManager.resolveContentProvider(auth, <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">if</span> (providerInfo != <span class="hljs-keyword">null</span>) {
+        RunUtil.runOnUiThread(<span class="hljs-keyword">new</span> Runnable() {
+            <span class="hljs-annotation">@Override</span>
+            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span>() {
+                <span class="hljs-keyword">try</span> {
+                    LoadedPlugin loadedPlugin = pluginManager.getLoadedPlugin(uri.getQueryParameter(KEY_PKG));
+                    ContentProvider contentProvider = (ContentProvider) Class.forName(providerInfo.name).newInstance();
+                    contentProvider.attachInfo(loadedPlugin.getPluginContext(), providerInfo);
+                    sCachedProviders.put(auth, contentProvider);
+                } <span class="hljs-keyword">catch</span> (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, <span class="hljs-keyword">true</span>);
+        <span class="hljs-keyword">return</span> sCachedProviders.get(auth);
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+}</code></pre>
+
+<p>很简单，取出原本的uri，拿到auth，在通过加载plugin得到providerInfo，反射生成provider对象，在调用其attachInfo方法即可。</p>
+
+<p>其他的几个方法：insert、update、delete、call逻辑基本相同，就不赘述了。</p>
+
+<p>感觉这里其实通过hook AMS的getContentProvider方法也能完成上述流程，感觉好像可以更彻底，不需要依赖PluginContext了。</p>
+
+
+
+<h2 id="六总结">六、总结</h2>
+
+<p>总结下，其实就是文初的内容，可以看到VritualApk大体方案如下：</p>
+
+<ul>
+<li>Activity：在宿主apk中提前占几个坑，然后通过“欺上瞒下”（这个词好像是360之前的ppt中提到）的方式，启动插件apk的Activity；因为要支持不同的launchMode以及一些特殊的属性，需要占多个坑。</li>
+<li>Service：通过代理Service的方式去分发；主进程和其他进程，VirtualAPK使用了两个代理Service。</li>
+<li>BroadcastReceiver：静态转动态。</li>
+<li>ContentProvider：通过一个代理Provider进行分发。</li>
+</ul>
+
+<p>整体代码看起来还是很轻松的~</p>
+
+<p>当然如果你要选择某一个插件化方案进行使用，一定要了解其中的实现原理，文档上描述的并不是所有细节，很多一些属性什么的，以及由于其实现的方式造成一些特性的不支持。了解源码，可以方便自己排查问题，扩展，甚至写一套根据自己业务需求的插件化方案~~</p>
+
+<p>再多嘴一句，还是建议大多多在某一方面深入了解，不要痴迷于UI特效（上班路上看看我的推文就好啦~玩笑~，很多特效的，了解下原理即可）~~其实我早期浪费了很多时间在上面，在你掌握了自定义View的详细细节、事件分发机制这些机制后，大部分UI的编写都是时间问题。</p>
+
+<p>不要在上面浪费过多时间，比别人多研究几个特效并不会对自己的提升有巨大的帮助，过来人，忠言逆耳~。</p>
+
+<hr>
+
+<p>支持我的话可以关注下我的公众号，每天都会推送新知识~</p>
+
+<blockquote>
+  <p>欢迎关注我的微信公众号：hongyangAndroid  <br>
+  （可以给我留言你想学习的文章，支持投稿）  <br>
+  <img src="http://img.my.csdn.net/uploads/201501/30/1422600516_2905.jpg" width="180px"></p>
+</blockquote></div>
+        <script  type="text/javascript">
+            $(function () {
+                $('pre.prettyprint code').each(function () {
+                    var lines = $(this).text().split('\n').length;
+                    var $numbering = $('<ul/>').addClass('pre-numbering').hide();
+                    $(this).addClass('has-numbering').parent().append($numbering);
+                    for (i = 1; i <= lines; i++) {
+                        $numbering.append($('<li/>').text(i));
+                    };
+                    $numbering.fadeIn(1700);
+                });
+            });
+        </script>
+   
+</div>
+
+
+
+
+
+
+
+
+    <div class="readall_box csdn-tracking-statistics tracking-click"  data-pid="blog"  data-mod="popu_596">
+        <div class="read_more_mask"></div>
+        <a class="btn btn-large btn-gray-fred read_more_btn" target="_self">阅读全文</a>
+    </div>
+
+    <div class="csdn-tracking-statistics" data-pid="blog"  data-mod="popu_222"><a href="javascript:void(0);" >&nbsp;</a>   </div>
+    <div class="csdn-tracking-statistics" data-pid="blog"  data-mod="popu_223"> <a href="javascript:void(0);" >&nbsp;</a></div>
+        <div id="digg" ArticleId="75000580" >
+            <dl id="btnDigg" class="digg digg_disable"  onclick="btndigga();">
+               
+                 <dt>顶</dt>
+                <dd>20</dd>
+            </dl>
+           
+              
+            <dl id="btnBury" class="digg digg_disable"  onclick="btnburya();">
+              
+                  <dt>踩</dt>
+                <dd>2</dd>               
+            </dl>
+            
+        </div>
+    <script type="text/javascript">
+        function btndigga() {
+            $(".csdn-tracking-statistics[data-mod='popu_222'] a").click();
+        }
+        function btnburya() {
+            $(".csdn-tracking-statistics[data-mod='popu_223'] a").click();
+        }
+            </script>
+
+   <ul class="article_next_prev">
+                <li class="prev_article"><span  onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_shangyipian']);location.href='http://blog.csdn.net/lmj623565791/article/details/72859156';">上一篇</span><a href="http://blog.csdn.net/lmj623565791/article/details/72859156" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_shangyipian'])">Android 7.0 行为变更 通过FileProvider在应用间共享文件吧</a></li>
+                <li class="next_article"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_xiayipian']);location.href='http://blog.csdn.net/lmj623565791/article/details/77937483';">下一篇</span><a href="http://blog.csdn.net/lmj623565791/article/details/77937483" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_xiayipian'])">轻松入门Android直播相关技术 从0搭建直播系统</a></li>
+    </ul>
+
+    <div style="clear:both; height:10px;"></div>
+
+   
+      
+</div>
+
+     <div>
+         
+         <!-- 广告位：PC端-博客详情页底部banner-960*90 -->
+            <script>
+                (function() {
+                    var s = "_" + Math.random().toString(36).slice(2);
+                    document.write('<div id="' + s + '"></div>');
+                    (window.slotbydup=window.slotbydup || []).push({
+                        id: '4770928',
+                        container: s,
+                        size: '960,90',
+                        display: 'inlay-fix'
+                    });
+                })();
+            </script>
+    </div>
+
+<div id="suggest"></div>
+         <script  language="javascript" type='text/javascript'>     
+             $(function(){
+                 $.get("/lmj623565791/svc/GetSuggestContent/75000580",function(data){
+                     $("#suggest").html(data);
+                 });     
+             });             
+         </script>  
+
+
+
+
+            
+                                    
+            
+                                    
+
+        <!-- 广告位开始 -->
+        <!-- 广告位结束 -->
+
+
+
+<div class="comment_class">
+    <div id="comment_title" class="panel_head">
+        <span class="see_comment">查看评论</span><a name="comments"></a></div>
+    <div id="comment_list">
+    </div>
+    <div id="comment_bar">
+    </div>
+<div class="commentform"><div class="panel_head">发表评论</div></div>
+    <div id="comment_form">
+
+    </div>
+    <div class="announce">
+        * 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+</div>
+<div class="recommend_list">
+
+    
+            <dl class="clearfix csdn-tracking-statistics recommend_article" data-mod="popu_614" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+<a href="/yyh352091626/article/details/74852390"  target="_blank" strategy="BlogCommendFromBaidu_0">
+                <dd>
+                    <h2>滴滴开源Android插件化框架VirtualAPK原理分析</h2>
+                    <div class="summary">
+                        概述
+Activity 支持
+Hook ActivityManagerService
+Hook Instrumentation
+启动插件Activity
+Service 支持
+ContentProvider 支持
+Receiver 支持
+小结概述滴滴出行公司的首个对外开源项目 - VirtualAP...
+                    </div>
+                    <ul>
+                        <li class="avatar_img"><img src="http://avatar.csdn.net/B/5/F/2_yyh352091626.jpg" alt="yyh352091626" title="yyh352091626"></li>
+                        <li class="user_name">yyh352091626</li>
+                        <li class="time">2017-07-08 19:30</li>
+                        <li class="visited_num"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="16" height="16"   fill = "#ccc"><defs><style/></defs><path d="M988.16 240.64c0-5.12-2.56-11.52-6.4-15.36-2.56-2.56-51.2-55.04-135.68-81.92-32-10.24-64-15.36-96-15.36-97.28 0-181.76 46.08-235.52 84.48-55.04-39.68-139.52-85.76-236.8-85.76-32 0-65.28 5.12-96 15.36C97.28 168.96 49.92 224 47.36 226.56c-3.84 3.84-5.12 8.96-5.12 15.36v546.56l60.16 71.68c3.84 8.96 12.8 15.36 21.76 15.36 3.84 0 7.68 0 10.24-2.56 19.2-5.12 120.32-29.44 199.68-29.44 37.12 0 64 5.12 79.36 15.36 7.68 5.12 11.52 10.24 12.8 16.64 0 12.8 10.24 23.04 23.04 23.04h21.76c24.32 0 61.44 0 98.56-2.56h5.12c10.24 0 20.48-7.68 23.04-17.92 2.56-10.24 7.68-16.64 17.92-23.04 16.64-8.96 42.24-14.08 76.8-14.08 78.08 0 171.52 24.32 198.4 32 3.84 1.28 7.68 2.56 11.52 2.56 8.96 0 17.92-5.12 21.76-14.08l64-72.96V240.64zM88.32 744.96V250.88c14.08-14.08 52.48-46.08 107.52-64 26.88-8.96 53.76-12.8 81.92-12.8 70.4 0 142.08 26.88 213.76 79.36v477.44c-38.4-23.04-88.32-34.56-149.76-34.56-32 0-66.56 3.84-102.4 10.24-60.16 8.96-115.2 26.88-151.04 38.4zm805.12 79.36c-20.48-5.12-61.44-15.36-106.24-23.04-35.84-5.12-66.56-7.68-94.72-7.68-43.52 0-76.8 6.4-101.12 20.48-15.36 8.96-26.88 20.48-33.28 34.56-33.28 1.28-65.28 2.56-87.04 2.56h-3.84c-6.4-12.8-15.36-24.32-29.44-32-23.04-15.36-58.88-21.76-106.24-21.76-76.8 0-165.12 19.2-200.96 28.16l-29.44-35.84c51.2-17.92 148.48-47.36 240.64-47.36 70.4 0 122.88 17.92 153.6 52.48l2.56 2.56 1.28 1.28 1.28 1.28 1.28 1.28h1.28l2.56 1.28h11.52l2.56-1.28h1.28s1.28 0 1.28-1.28h1.28s1.28 0 1.28-1.28h1.28l2.56-2.56c30.72-37.12 81.92-56.32 152.32-56.32 39.68 0 122.88 6.4 240.64 49.92l-28.16 34.56zm47.36-79.36c-35.84-14.08-90.88-32-152.32-43.52-37.12-6.4-71.68-10.24-103.68-10.24-60.16 0-110.08 12.8-148.48 37.12V253.44c70.4-51.2 142.08-78.08 212.48-78.08 28.16 0 55.04 3.84 81.92 12.8 56.32 17.92 94.72 49.92 110.08 64v492.8z"/></svg><span>7311</span></li>
+                    </ul>
+                </dd>
+</a>
+            </dl>
+            
+            <dl class="clearfix csdn-tracking-statistics recommend_article" data-mod="popu_614" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+<a href="/z4909801/article/details/75305533"  target="_blank" strategy="BlogCommendFromBaidu_1">
+                <dd>
+                    <h2>Android插件化快速入门与实例解析（VirtualApk）</h2>
+                    <div class="summary">
+                        集成一个第三方相册功能，只需集成一个插件APK到项目中，无需集成额外代码，并且支持随时更新相册功能，无需发布版本更新，无需AndroidManifest中声明四大组件，这就是插件化。
+　　插件化可利用性很广，但事实上大多数开发者，因为未知而放弃使用，所以本篇将深入浅出带你了解插件化原理，从基础到实...
+                    </div>
+                    <ul>
+                        <li class="avatar_img"><img src="http://avatar.csdn.net/6/C/9/2_z4909801.jpg" alt="z4909801" title="z4909801"></li>
+                        <li class="user_name">z4909801</li>
+                        <li class="time">2017-07-18 15:24</li>
+                        <li class="visited_num"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="16" height="16"   fill = "#ccc"><defs><style/></defs><path d="M988.16 240.64c0-5.12-2.56-11.52-6.4-15.36-2.56-2.56-51.2-55.04-135.68-81.92-32-10.24-64-15.36-96-15.36-97.28 0-181.76 46.08-235.52 84.48-55.04-39.68-139.52-85.76-236.8-85.76-32 0-65.28 5.12-96 15.36C97.28 168.96 49.92 224 47.36 226.56c-3.84 3.84-5.12 8.96-5.12 15.36v546.56l60.16 71.68c3.84 8.96 12.8 15.36 21.76 15.36 3.84 0 7.68 0 10.24-2.56 19.2-5.12 120.32-29.44 199.68-29.44 37.12 0 64 5.12 79.36 15.36 7.68 5.12 11.52 10.24 12.8 16.64 0 12.8 10.24 23.04 23.04 23.04h21.76c24.32 0 61.44 0 98.56-2.56h5.12c10.24 0 20.48-7.68 23.04-17.92 2.56-10.24 7.68-16.64 17.92-23.04 16.64-8.96 42.24-14.08 76.8-14.08 78.08 0 171.52 24.32 198.4 32 3.84 1.28 7.68 2.56 11.52 2.56 8.96 0 17.92-5.12 21.76-14.08l64-72.96V240.64zM88.32 744.96V250.88c14.08-14.08 52.48-46.08 107.52-64 26.88-8.96 53.76-12.8 81.92-12.8 70.4 0 142.08 26.88 213.76 79.36v477.44c-38.4-23.04-88.32-34.56-149.76-34.56-32 0-66.56 3.84-102.4 10.24-60.16 8.96-115.2 26.88-151.04 38.4zm805.12 79.36c-20.48-5.12-61.44-15.36-106.24-23.04-35.84-5.12-66.56-7.68-94.72-7.68-43.52 0-76.8 6.4-101.12 20.48-15.36 8.96-26.88 20.48-33.28 34.56-33.28 1.28-65.28 2.56-87.04 2.56h-3.84c-6.4-12.8-15.36-24.32-29.44-32-23.04-15.36-58.88-21.76-106.24-21.76-76.8 0-165.12 19.2-200.96 28.16l-29.44-35.84c51.2-17.92 148.48-47.36 240.64-47.36 70.4 0 122.88 17.92 153.6 52.48l2.56 2.56 1.28 1.28 1.28 1.28 1.28 1.28h1.28l2.56 1.28h11.52l2.56-1.28h1.28s1.28 0 1.28-1.28h1.28s1.28 0 1.28-1.28h1.28l2.56-2.56c30.72-37.12 81.92-56.32 152.32-56.32 39.68 0 122.88 6.4 240.64 49.92l-28.16 34.56zm47.36-79.36c-35.84-14.08-90.88-32-152.32-43.52-37.12-6.4-71.68-10.24-103.68-10.24-60.16 0-110.08 12.8-148.48 37.12V253.44c70.4-51.2 142.08-78.08 212.48-78.08 28.16 0 55.04 3.84 81.92 12.8 56.32 17.92 94.72 49.92 110.08 64v492.8z"/></svg><span>889</span></li>
+                    </ul>
+                </dd>
+</a>
+            </dl>
+            <script>(function() {var s = "_" + Math.random().toString(36).slice(2);document.write('<div id="' + s + '"></div>');(window.slotbydup = window.slotbydup || []).push({id: '4765209',container: s,size: '808,120',display: 'inlay-fix'});})();</script> 
+            <dl class="clearfix csdn-tracking-statistics recommend_article" data-mod="popu_614" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+<a href="/u012124438/article/details/74118905"  target="_blank" strategy="BlogCommendFromBaidu_2">
+                <dd>
+                    <h2>滴滴插件化框架VirtualAPK原理解析（一）之插件Activity管理</h2>
+                    <div class="summary">
+                        上周末，滴滴与360都开源了各自的插件化框架，Virtualapk与RePlugin,作为一个插件化方面的狂热研究者，在周末就迫不及待的下载了Virtualapk框架来进行研究，本篇博客带来的是Virtualapk原理解析的第一篇Activity管理，博客只是自己的理解，小弟才疏学浅，可能有很多理解...
+                    </div>
+                    <ul>
+                        <li class="avatar_img"><img src="http://avatar.csdn.net/B/9/9/2_u012124438.jpg" alt="u012124438" title="u012124438"></li>
+                        <li class="user_name">u012124438</li>
+                        <li class="time">2017-07-02 21:15</li>
+                        <li class="visited_num"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="16" height="16"   fill = "#ccc"><defs><style/></defs><path d="M988.16 240.64c0-5.12-2.56-11.52-6.4-15.36-2.56-2.56-51.2-55.04-135.68-81.92-32-10.24-64-15.36-96-15.36-97.28 0-181.76 46.08-235.52 84.48-55.04-39.68-139.52-85.76-236.8-85.76-32 0-65.28 5.12-96 15.36C97.28 168.96 49.92 224 47.36 226.56c-3.84 3.84-5.12 8.96-5.12 15.36v546.56l60.16 71.68c3.84 8.96 12.8 15.36 21.76 15.36 3.84 0 7.68 0 10.24-2.56 19.2-5.12 120.32-29.44 199.68-29.44 37.12 0 64 5.12 79.36 15.36 7.68 5.12 11.52 10.24 12.8 16.64 0 12.8 10.24 23.04 23.04 23.04h21.76c24.32 0 61.44 0 98.56-2.56h5.12c10.24 0 20.48-7.68 23.04-17.92 2.56-10.24 7.68-16.64 17.92-23.04 16.64-8.96 42.24-14.08 76.8-14.08 78.08 0 171.52 24.32 198.4 32 3.84 1.28 7.68 2.56 11.52 2.56 8.96 0 17.92-5.12 21.76-14.08l64-72.96V240.64zM88.32 744.96V250.88c14.08-14.08 52.48-46.08 107.52-64 26.88-8.96 53.76-12.8 81.92-12.8 70.4 0 142.08 26.88 213.76 79.36v477.44c-38.4-23.04-88.32-34.56-149.76-34.56-32 0-66.56 3.84-102.4 10.24-60.16 8.96-115.2 26.88-151.04 38.4zm805.12 79.36c-20.48-5.12-61.44-15.36-106.24-23.04-35.84-5.12-66.56-7.68-94.72-7.68-43.52 0-76.8 6.4-101.12 20.48-15.36 8.96-26.88 20.48-33.28 34.56-33.28 1.28-65.28 2.56-87.04 2.56h-3.84c-6.4-12.8-15.36-24.32-29.44-32-23.04-15.36-58.88-21.76-106.24-21.76-76.8 0-165.12 19.2-200.96 28.16l-29.44-35.84c51.2-17.92 148.48-47.36 240.64-47.36 70.4 0 122.88 17.92 153.6 52.48l2.56 2.56 1.28 1.28 1.28 1.28 1.28 1.28h1.28l2.56 1.28h11.52l2.56-1.28h1.28s1.28 0 1.28-1.28h1.28s1.28 0 1.28-1.28h1.28l2.56-2.56c30.72-37.12 81.92-56.32 152.32-56.32 39.68 0 122.88 6.4 240.64 49.92l-28.16 34.56zm47.36-79.36c-35.84-14.08-90.88-32-152.32-43.52-37.12-6.4-71.68-10.24-103.68-10.24-60.16 0-110.08 12.8-148.48 37.12V253.44c70.4-51.2 142.08-78.08 212.48-78.08 28.16 0 55.04 3.84 81.92 12.8 56.32 17.92 94.72 49.92 110.08 64v492.8z"/></svg><span>6093</span></li>
+                    </ul>
+                </dd>
+</a>
+            </dl>
+            
+            <dl class="clearfix csdn-tracking-statistics recommend_article" data-mod="popu_614" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+<a href="/anhenzhufeng/article/details/75411779"  target="_blank" strategy="BlogCommendFromBaidu_3">
+                <dd>
+                    <h2>从源码看滴滴插件化框架VirtualApk</h2>
+                    <div class="summary">
+                        滴滴开源插件框架地址：https://github.com/didi/VirtualAPK
+大神鸿洋的框架分析：http://blog.csdn.net/lmj623565791/article/details/75000580
+框架接入：http://www.jianshu.com/p/01351...
+                    </div>
+                    <ul>
+                        <li class="avatar_img"><img src="http://avatar.csdn.net/6/B/5/2_anhenzhufeng.jpg" alt="anhenzhufeng" title="anhenzhufeng"></li>
+                        <li class="user_name">anhenzhufeng</li>
+                        <li class="time">2017-07-20 21:50</li>
+                        <li class="visited_num"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="16" height="16"   fill = "#ccc"><defs><style/></defs><path d="M988.16 240.64c0-5.12-2.56-11.52-6.4-15.36-2.56-2.56-51.2-55.04-135.68-81.92-32-10.24-64-15.36-96-15.36-97.28 0-181.76 46.08-235.52 84.48-55.04-39.68-139.52-85.76-236.8-85.76-32 0-65.28 5.12-96 15.36C97.28 168.96 49.92 224 47.36 226.56c-3.84 3.84-5.12 8.96-5.12 15.36v546.56l60.16 71.68c3.84 8.96 12.8 15.36 21.76 15.36 3.84 0 7.68 0 10.24-2.56 19.2-5.12 120.32-29.44 199.68-29.44 37.12 0 64 5.12 79.36 15.36 7.68 5.12 11.52 10.24 12.8 16.64 0 12.8 10.24 23.04 23.04 23.04h21.76c24.32 0 61.44 0 98.56-2.56h5.12c10.24 0 20.48-7.68 23.04-17.92 2.56-10.24 7.68-16.64 17.92-23.04 16.64-8.96 42.24-14.08 76.8-14.08 78.08 0 171.52 24.32 198.4 32 3.84 1.28 7.68 2.56 11.52 2.56 8.96 0 17.92-5.12 21.76-14.08l64-72.96V240.64zM88.32 744.96V250.88c14.08-14.08 52.48-46.08 107.52-64 26.88-8.96 53.76-12.8 81.92-12.8 70.4 0 142.08 26.88 213.76 79.36v477.44c-38.4-23.04-88.32-34.56-149.76-34.56-32 0-66.56 3.84-102.4 10.24-60.16 8.96-115.2 26.88-151.04 38.4zm805.12 79.36c-20.48-5.12-61.44-15.36-106.24-23.04-35.84-5.12-66.56-7.68-94.72-7.68-43.52 0-76.8 6.4-101.12 20.48-15.36 8.96-26.88 20.48-33.28 34.56-33.28 1.28-65.28 2.56-87.04 2.56h-3.84c-6.4-12.8-15.36-24.32-29.44-32-23.04-15.36-58.88-21.76-106.24-21.76-76.8 0-165.12 19.2-200.96 28.16l-29.44-35.84c51.2-17.92 148.48-47.36 240.64-47.36 70.4 0 122.88 17.92 153.6 52.48l2.56 2.56 1.28 1.28 1.28 1.28 1.28 1.28h1.28l2.56 1.28h11.52l2.56-1.28h1.28s1.28 0 1.28-1.28h1.28s1.28 0 1.28-1.28h1.28l2.56-2.56c30.72-37.12 81.92-56.32 152.32-56.32 39.68 0 122.88 6.4 240.64 49.92l-28.16 34.56zm47.36-79.36c-35.84-14.08-90.88-32-152.32-43.52-37.12-6.4-71.68-10.24-103.68-10.24-60.16 0-110.08 12.8-148.48 37.12V253.44c70.4-51.2 142.08-78.08 212.48-78.08 28.16 0 55.04 3.84 81.92 12.8 56.32 17.92 94.72 49.92 110.08 64v492.8z"/></svg><span>1150</span></li>
+                    </ul>
+                </dd>
+</a>
+            </dl>
+            <!-- 广告位：PC端-博客详情通栏7（feed流）-808*120 --><script async="async" charset="utf-8" src="https://shared.ydstatic.com/js/yatdk/3.0.0/stream.js"  data-id="8935aa488dd58452b9e5ee3b44f1212f" data-hide-ad-label = "0"  data-div-Style="width:100%; padding: 16px 35px 16px 10px; border-bottom:1px solid #f4f4f4;" data-img-Style="float:right;width:120px;"  data-tit-Style="font-size:20px;font-weight:bold;margin-bottom:10px;font-family:'PingFang SC','Microsoft YaHei',SimHei,Arial,SimSun;"  data-des-Style="width:700px;font-size:14px;font-family:'PingFang SC','Microsoft YaHei',SimHei,Arial,SimSun;"> </script>
+            <dl class="clearfix csdn-tracking-statistics recommend_article" data-mod="popu_614" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+<a href="/llayjun/article/details/77478990"  target="_blank" strategy="BlogCommendFromBaidu_4">
+                <dd>
+                    <h2>Android插件框架VirtualAPK学习和使用</h2>
+                    <div class="summary">
+                        滴滴的virtualAPK学习和使用
+                    </div>
+                    <ul>
+                        <li class="avatar_img"><img src="http://avatar.csdn.net/D/E/D/2_llayjun.jpg" alt="llayjun" title="llayjun"></li>
+                        <li class="user_name">llayjun</li>
+                        <li class="time">2017-08-22 13:36</li>
+                        <li class="visited_num"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="16" height="16"   fill = "#ccc"><defs><style/></defs><path d="M988.16 240.64c0-5.12-2.56-11.52-6.4-15.36-2.56-2.56-51.2-55.04-135.68-81.92-32-10.24-64-15.36-96-15.36-97.28 0-181.76 46.08-235.52 84.48-55.04-39.68-139.52-85.76-236.8-85.76-32 0-65.28 5.12-96 15.36C97.28 168.96 49.92 224 47.36 226.56c-3.84 3.84-5.12 8.96-5.12 15.36v546.56l60.16 71.68c3.84 8.96 12.8 15.36 21.76 15.36 3.84 0 7.68 0 10.24-2.56 19.2-5.12 120.32-29.44 199.68-29.44 37.12 0 64 5.12 79.36 15.36 7.68 5.12 11.52 10.24 12.8 16.64 0 12.8 10.24 23.04 23.04 23.04h21.76c24.32 0 61.44 0 98.56-2.56h5.12c10.24 0 20.48-7.68 23.04-17.92 2.56-10.24 7.68-16.64 17.92-23.04 16.64-8.96 42.24-14.08 76.8-14.08 78.08 0 171.52 24.32 198.4 32 3.84 1.28 7.68 2.56 11.52 2.56 8.96 0 17.92-5.12 21.76-14.08l64-72.96V240.64zM88.32 744.96V250.88c14.08-14.08 52.48-46.08 107.52-64 26.88-8.96 53.76-12.8 81.92-12.8 70.4 0 142.08 26.88 213.76 79.36v477.44c-38.4-23.04-88.32-34.56-149.76-34.56-32 0-66.56 3.84-102.4 10.24-60.16 8.96-115.2 26.88-151.04 38.4zm805.12 79.36c-20.48-5.12-61.44-15.36-106.24-23.04-35.84-5.12-66.56-7.68-94.72-7.68-43.52 0-76.8 6.4-101.12 20.48-15.36 8.96-26.88 20.48-33.28 34.56-33.28 1.28-65.28 2.56-87.04 2.56h-3.84c-6.4-12.8-15.36-24.32-29.44-32-23.04-15.36-58.88-21.76-106.24-21.76-76.8 0-165.12 19.2-200.96 28.16l-29.44-35.84c51.2-17.92 148.48-47.36 240.64-47.36 70.4 0 122.88 17.92 153.6 52.48l2.56 2.56 1.28 1.28 1.28 1.28 1.28 1.28h1.28l2.56 1.28h11.52l2.56-1.28h1.28s1.28 0 1.28-1.28h1.28s1.28 0 1.28-1.28h1.28l2.56-2.56c30.72-37.12 81.92-56.32 152.32-56.32 39.68 0 122.88 6.4 240.64 49.92l-28.16 34.56zm47.36-79.36c-35.84-14.08-90.88-32-152.32-43.52-37.12-6.4-71.68-10.24-103.68-10.24-60.16 0-110.08 12.8-148.48 37.12V253.44c70.4-51.2 142.08-78.08 212.48-78.08 28.16 0 55.04 3.84 81.92 12.8 56.32 17.92 94.72 49.92 110.08 64v492.8z"/></svg><span>593</span></li>
+                    </ul>
+                </dd>
+</a>
+            </dl>
+            
+            <dl class="clearfix csdn-tracking-statistics recommend_article" data-mod="popu_614" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+<a href="/c10wtiybq1ye3/article/details/78956166"  target="_blank" strategy="BlogCommendFromBaidu_5">
+                <dd>
+                    <h2>插件化探索，滴滴开源框架VirtualAPK的深入分析</h2>
+                    <div class="summary">
+                        今日科技快讯昨日滴滴出行宣布完成新一轮超40亿美元股权融资，投资方包括阿布扎比慕巴达拉公司（Mubadala）和软银集团（SoftBank）。同时滴滴表示：将加大在AI人才贮备以及技术上的投入规模，将持续提速智能驾驶与智慧交通的能力建设，加快构建新能源汽车服务体系。作者简介明天就是周六啦，提前祝大家...
+                    </div>
+                    <ul>
+                        <li class="avatar_img"><img src="http://avatar.csdn.net/6/F/2/2_c10wtiybq1ye3.jpg" alt="c10WTiybQ1Ye3" title="c10WTiybQ1Ye3"></li>
+                        <li class="user_name">c10WTiybQ1Ye3</li>
+                        <li class="time">2017-12-22 00:00</li>
+                        <li class="visited_num"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="16" height="16"   fill = "#ccc"><defs><style/></defs><path d="M988.16 240.64c0-5.12-2.56-11.52-6.4-15.36-2.56-2.56-51.2-55.04-135.68-81.92-32-10.24-64-15.36-96-15.36-97.28 0-181.76 46.08-235.52 84.48-55.04-39.68-139.52-85.76-236.8-85.76-32 0-65.28 5.12-96 15.36C97.28 168.96 49.92 224 47.36 226.56c-3.84 3.84-5.12 8.96-5.12 15.36v546.56l60.16 71.68c3.84 8.96 12.8 15.36 21.76 15.36 3.84 0 7.68 0 10.24-2.56 19.2-5.12 120.32-29.44 199.68-29.44 37.12 0 64 5.12 79.36 15.36 7.68 5.12 11.52 10.24 12.8 16.64 0 12.8 10.24 23.04 23.04 23.04h21.76c24.32 0 61.44 0 98.56-2.56h5.12c10.24 0 20.48-7.68 23.04-17.92 2.56-10.24 7.68-16.64 17.92-23.04 16.64-8.96 42.24-14.08 76.8-14.08 78.08 0 171.52 24.32 198.4 32 3.84 1.28 7.68 2.56 11.52 2.56 8.96 0 17.92-5.12 21.76-14.08l64-72.96V240.64zM88.32 744.96V250.88c14.08-14.08 52.48-46.08 107.52-64 26.88-8.96 53.76-12.8 81.92-12.8 70.4 0 142.08 26.88 213.76 79.36v477.44c-38.4-23.04-88.32-34.56-149.76-34.56-32 0-66.56 3.84-102.4 10.24-60.16 8.96-115.2 26.88-151.04 38.4zm805.12 79.36c-20.48-5.12-61.44-15.36-106.24-23.04-35.84-5.12-66.56-7.68-94.72-7.68-43.52 0-76.8 6.4-101.12 20.48-15.36 8.96-26.88 20.48-33.28 34.56-33.28 1.28-65.28 2.56-87.04 2.56h-3.84c-6.4-12.8-15.36-24.32-29.44-32-23.04-15.36-58.88-21.76-106.24-21.76-76.8 0-165.12 19.2-200.96 28.16l-29.44-35.84c51.2-17.92 148.48-47.36 240.64-47.36 70.4 0 122.88 17.92 153.6 52.48l2.56 2.56 1.28 1.28 1.28 1.28 1.28 1.28h1.28l2.56 1.28h11.52l2.56-1.28h1.28s1.28 0 1.28-1.28h1.28s1.28 0 1.28-1.28h1.28l2.56-2.56c30.72-37.12 81.92-56.32 152.32-56.32 39.68 0 122.88 6.4 240.64 49.92l-28.16 34.56zm47.36-79.36c-35.84-14.08-90.88-32-152.32-43.52-37.12-6.4-71.68-10.24-103.68-10.24-60.16 0-110.08 12.8-148.48 37.12V253.44c70.4-51.2 142.08-78.08 212.48-78.08 28.16 0 55.04 3.84 81.92 12.8 56.32 17.92 94.72 49.92 110.08 64v492.8z"/></svg><span>98</span></li>
+                    </ul>
+                </dd>
+</a>
+            </dl>
+            
+            <dl class="clearfix csdn-tracking-statistics recommend_article" data-mod="popu_614" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+<a href="/qq_15330241/article/details/78869843"  target="_blank" strategy="BlogCommendFromBaidu_6">
+                <dd>
+                    <h2>手把手教你集成滴滴的插件化框架virtualapk</h2>
+                    <div class="summary">
+                        手把手教你集成滴滴的插件化框架virtualapk
+                    </div>
+                    <ul>
+                        <li class="avatar_img"><img src="http://avatar.csdn.net/7/1/2/2_qq_15330241.jpg" alt="qq_15330241" title="qq_15330241"></li>
+                        <li class="user_name">qq_15330241</li>
+                        <li class="time">2017-12-22 09:43</li>
+                        <li class="visited_num"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="16" height="16"   fill = "#ccc"><defs><style/></defs><path d="M988.16 240.64c0-5.12-2.56-11.52-6.4-15.36-2.56-2.56-51.2-55.04-135.68-81.92-32-10.24-64-15.36-96-15.36-97.28 0-181.76 46.08-235.52 84.48-55.04-39.68-139.52-85.76-236.8-85.76-32 0-65.28 5.12-96 15.36C97.28 168.96 49.92 224 47.36 226.56c-3.84 3.84-5.12 8.96-5.12 15.36v546.56l60.16 71.68c3.84 8.96 12.8 15.36 21.76 15.36 3.84 0 7.68 0 10.24-2.56 19.2-5.12 120.32-29.44 199.68-29.44 37.12 0 64 5.12 79.36 15.36 7.68 5.12 11.52 10.24 12.8 16.64 0 12.8 10.24 23.04 23.04 23.04h21.76c24.32 0 61.44 0 98.56-2.56h5.12c10.24 0 20.48-7.68 23.04-17.92 2.56-10.24 7.68-16.64 17.92-23.04 16.64-8.96 42.24-14.08 76.8-14.08 78.08 0 171.52 24.32 198.4 32 3.84 1.28 7.68 2.56 11.52 2.56 8.96 0 17.92-5.12 21.76-14.08l64-72.96V240.64zM88.32 744.96V250.88c14.08-14.08 52.48-46.08 107.52-64 26.88-8.96 53.76-12.8 81.92-12.8 70.4 0 142.08 26.88 213.76 79.36v477.44c-38.4-23.04-88.32-34.56-149.76-34.56-32 0-66.56 3.84-102.4 10.24-60.16 8.96-115.2 26.88-151.04 38.4zm805.12 79.36c-20.48-5.12-61.44-15.36-106.24-23.04-35.84-5.12-66.56-7.68-94.72-7.68-43.52 0-76.8 6.4-101.12 20.48-15.36 8.96-26.88 20.48-33.28 34.56-33.28 1.28-65.28 2.56-87.04 2.56h-3.84c-6.4-12.8-15.36-24.32-29.44-32-23.04-15.36-58.88-21.76-106.24-21.76-76.8 0-165.12 19.2-200.96 28.16l-29.44-35.84c51.2-17.92 148.48-47.36 240.64-47.36 70.4 0 122.88 17.92 153.6 52.48l2.56 2.56 1.28 1.28 1.28 1.28 1.28 1.28h1.28l2.56 1.28h11.52l2.56-1.28h1.28s1.28 0 1.28-1.28h1.28s1.28 0 1.28-1.28h1.28l2.56-2.56c30.72-37.12 81.92-56.32 152.32-56.32 39.68 0 122.88 6.4 240.64 49.92l-28.16 34.56zm47.36-79.36c-35.84-14.08-90.88-32-152.32-43.52-37.12-6.4-71.68-10.24-103.68-10.24-60.16 0-110.08 12.8-148.48 37.12V253.44c70.4-51.2 142.08-78.08 212.48-78.08 28.16 0 55.04 3.84 81.92 12.8 56.32 17.92 94.72 49.92 110.08 64v492.8z"/></svg><span>115</span></li>
+                    </ul>
+                </dd>
+</a>
+            </dl>
+            
+            <dl class="clearfix csdn-tracking-statistics downloadElement" data-mod="popu_36" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+        <a href="http://download.csdn.net/download/qq_32120667/10149773"  target="_blank" strategy="BlogCommendFromBaidu_7">       
+		<dd class="floatL">
+			<div class="summary">
+				<h2>良心DEMO_滴滴开源框架VirtualApk的Demo</h2>
+				<div class="summary">
+				  <ul>
+					  <li class="time">2017-12-07 16:28</li>
+					  <li class="visited_num fileSize">85.29MB</li>
+					  <li class="download_btn">下载</li>
+				  </ul>
+				</div> 
+			</div>
+		</dd>
+	<dt class="floatR"><a href="http://download.csdn.net/download/qq_32120667/10149773" target="_blank" strategy="BlogCommendFromBaidu_7"><img class="maxwidth" src="http://download.csdn.net/images/minetype/unkonw.svg" alt="" title=""></dt></a>
+            </dl>
+            
+            <dl class="clearfix csdn-tracking-statistics recommend_article" data-mod="popu_614" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+<a href="/happy_horse/article/details/76467621"  target="_blank" strategy="BlogCommendFromBaidu_8">
+                <dd>
+                    <h2>《Android 插件化框架VirtualAPK ：（一）基本集成》</h2>
+                    <div class="summary">
+                        一、VirtualAPK 介绍VirtualAPK 是我们推出的一款Android平台上的插件化方案，通过VirtualAPK，可以让APP无需重新发版即可上线新功能。之所以做这件事，是因为传统的开发流程中，APP进行版本迭代的时候，有着严格的时间周期的要求，必须在规定的时间点完成功能开发，也必须在...
+                    </div>
+                    <ul>
+                        <li class="avatar_img"><img src="http://avatar.csdn.net/F/4/D/2_happy_horse.jpg" alt="happy_horse" title="happy_horse"></li>
+                        <li class="user_name">happy_horse</li>
+                        <li class="time">2017-07-31 19:50</li>
+                        <li class="visited_num"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="16" height="16"   fill = "#ccc"><defs><style/></defs><path d="M988.16 240.64c0-5.12-2.56-11.52-6.4-15.36-2.56-2.56-51.2-55.04-135.68-81.92-32-10.24-64-15.36-96-15.36-97.28 0-181.76 46.08-235.52 84.48-55.04-39.68-139.52-85.76-236.8-85.76-32 0-65.28 5.12-96 15.36C97.28 168.96 49.92 224 47.36 226.56c-3.84 3.84-5.12 8.96-5.12 15.36v546.56l60.16 71.68c3.84 8.96 12.8 15.36 21.76 15.36 3.84 0 7.68 0 10.24-2.56 19.2-5.12 120.32-29.44 199.68-29.44 37.12 0 64 5.12 79.36 15.36 7.68 5.12 11.52 10.24 12.8 16.64 0 12.8 10.24 23.04 23.04 23.04h21.76c24.32 0 61.44 0 98.56-2.56h5.12c10.24 0 20.48-7.68 23.04-17.92 2.56-10.24 7.68-16.64 17.92-23.04 16.64-8.96 42.24-14.08 76.8-14.08 78.08 0 171.52 24.32 198.4 32 3.84 1.28 7.68 2.56 11.52 2.56 8.96 0 17.92-5.12 21.76-14.08l64-72.96V240.64zM88.32 744.96V250.88c14.08-14.08 52.48-46.08 107.52-64 26.88-8.96 53.76-12.8 81.92-12.8 70.4 0 142.08 26.88 213.76 79.36v477.44c-38.4-23.04-88.32-34.56-149.76-34.56-32 0-66.56 3.84-102.4 10.24-60.16 8.96-115.2 26.88-151.04 38.4zm805.12 79.36c-20.48-5.12-61.44-15.36-106.24-23.04-35.84-5.12-66.56-7.68-94.72-7.68-43.52 0-76.8 6.4-101.12 20.48-15.36 8.96-26.88 20.48-33.28 34.56-33.28 1.28-65.28 2.56-87.04 2.56h-3.84c-6.4-12.8-15.36-24.32-29.44-32-23.04-15.36-58.88-21.76-106.24-21.76-76.8 0-165.12 19.2-200.96 28.16l-29.44-35.84c51.2-17.92 148.48-47.36 240.64-47.36 70.4 0 122.88 17.92 153.6 52.48l2.56 2.56 1.28 1.28 1.28 1.28 1.28 1.28h1.28l2.56 1.28h11.52l2.56-1.28h1.28s1.28 0 1.28-1.28h1.28s1.28 0 1.28-1.28h1.28l2.56-2.56c30.72-37.12 81.92-56.32 152.32-56.32 39.68 0 122.88 6.4 240.64 49.92l-28.16 34.56zm47.36-79.36c-35.84-14.08-90.88-32-152.32-43.52-37.12-6.4-71.68-10.24-103.68-10.24-60.16 0-110.08 12.8-148.48 37.12V253.44c70.4-51.2 142.08-78.08 212.48-78.08 28.16 0 55.04 3.84 81.92 12.8 56.32 17.92 94.72 49.92 110.08 64v492.8z"/></svg><span>1064</span></li>
+                    </ul>
+                </dd>
+</a>
+            </dl>
+            
+            <dl class="clearfix csdn-tracking-statistics recommend_article" data-mod="popu_614" data-poputype="feed"  data-feed-show="false"  data-dsm="post">
+<a href="/ccm_oliver/article/details/53928451"  target="_blank" strategy="BlogCommendFromBaidu_9">
+                <dd>
+                    <h2>Android插件化认知</h2>
+                    <div class="summary">
+                        Android 插件化学习一突然想到Android 的插件化开发，于是网上搜罗资料，初步认知demo如下： 
+主要思想：利用 类加载器ClassLoader实现。解决主要问题：一个是65K 大小问题，另外可以动态加载apk实现程序的动态更新等等。简要思路：插件化APK的思路为：将部分代码分离出来放在...
+                    </div>
+                    <ul>
+                        <li class="avatar_img"><img src="http://avatar.csdn.net/5/D/E/2_ccm_oliver.jpg" alt="ccm_oliver" title="ccm_oliver"></li>
+                        <li class="user_name">ccm_oliver</li>
+                        <li class="time">2016-12-29 15:58</li>
+                        <li class="visited_num"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="16" height="16"   fill = "#ccc"><defs><style/></defs><path d="M988.16 240.64c0-5.12-2.56-11.52-6.4-15.36-2.56-2.56-51.2-55.04-135.68-81.92-32-10.24-64-15.36-96-15.36-97.28 0-181.76 46.08-235.52 84.48-55.04-39.68-139.52-85.76-236.8-85.76-32 0-65.28 5.12-96 15.36C97.28 168.96 49.92 224 47.36 226.56c-3.84 3.84-5.12 8.96-5.12 15.36v546.56l60.16 71.68c3.84 8.96 12.8 15.36 21.76 15.36 3.84 0 7.68 0 10.24-2.56 19.2-5.12 120.32-29.44 199.68-29.44 37.12 0 64 5.12 79.36 15.36 7.68 5.12 11.52 10.24 12.8 16.64 0 12.8 10.24 23.04 23.04 23.04h21.76c24.32 0 61.44 0 98.56-2.56h5.12c10.24 0 20.48-7.68 23.04-17.92 2.56-10.24 7.68-16.64 17.92-23.04 16.64-8.96 42.24-14.08 76.8-14.08 78.08 0 171.52 24.32 198.4 32 3.84 1.28 7.68 2.56 11.52 2.56 8.96 0 17.92-5.12 21.76-14.08l64-72.96V240.64zM88.32 744.96V250.88c14.08-14.08 52.48-46.08 107.52-64 26.88-8.96 53.76-12.8 81.92-12.8 70.4 0 142.08 26.88 213.76 79.36v477.44c-38.4-23.04-88.32-34.56-149.76-34.56-32 0-66.56 3.84-102.4 10.24-60.16 8.96-115.2 26.88-151.04 38.4zm805.12 79.36c-20.48-5.12-61.44-15.36-106.24-23.04-35.84-5.12-66.56-7.68-94.72-7.68-43.52 0-76.8 6.4-101.12 20.48-15.36 8.96-26.88 20.48-33.28 34.56-33.28 1.28-65.28 2.56-87.04 2.56h-3.84c-6.4-12.8-15.36-24.32-29.44-32-23.04-15.36-58.88-21.76-106.24-21.76-76.8 0-165.12 19.2-200.96 28.16l-29.44-35.84c51.2-17.92 148.48-47.36 240.64-47.36 70.4 0 122.88 17.92 153.6 52.48l2.56 2.56 1.28 1.28 1.28 1.28 1.28 1.28h1.28l2.56 1.28h11.52l2.56-1.28h1.28s1.28 0 1.28-1.28h1.28s1.28 0 1.28-1.28h1.28l2.56-2.56c30.72-37.12 81.92-56.32 152.32-56.32 39.68 0 122.88 6.4 240.64 49.92l-28.16 34.56zm47.36-79.36c-35.84-14.08-90.88-32-152.32-43.52-37.12-6.4-71.68-10.24-103.68-10.24-60.16 0-110.08 12.8-148.48 37.12V253.44c70.4-51.2 142.08-78.08 212.48-78.08 28.16 0 55.04 3.84 81.92 12.8 56.32 17.92 94.72 49.92 110.08 64v492.8z"/></svg><span>2035</span></li>
+                    </ul>
+                </dd>
+</a>
+            </dl>
+            
+</div>
+<script type="text/javascript">
+    var fileName = '75000580';
+    var commentscount = 45;
+    var islock = false
+document.domain = "csdn.net";
+</script>
+
+    <div id="ad_bot">
+    </div>
+<div id="report_dialog">
+</div>
+
+<div id="d-top"  style="bottom:60px;">
+
+
+        <a id="quick-reply" class="btn btn-top q-reply" title="快速回复" style="display:none;">
+            <img src="http://static.blog.csdn.net/images/blog-icon-reply.png" alt="快速回复">
+        </a>    
+    <a id="d-top-a" class="btn btn-top backtop"  style="display: none;" title="返回顶部" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_huidaodingbu'])" style="">         
+         <img src="http://static.blog.csdn.net/images/top.png" alt="TOP">
+    </a>
+</div>
+<script type="text/javascript">
+    $(function ()
+    {
+        $("#ad_frm_0").height("90px");
+        
+        setTimeout(function(){
+            $("#ad_frm_2").height("200px");
+        },1000);    
+    });
+  
+</script>
+<style type="text/css">
+    .tag_list
+    {
+        background: none repeat scroll 0 0 #FFFFFF;
+        border: 1px solid #D7CBC1;
+        color: #000000;
+        font-size: 12px;
+        line-height: 20px;
+        list-style: none outside none;
+        margin: 10px 2% 0 1%;
+        padding: 1px;
+    }
+    .tag_list h5
+    {
+        background: none repeat scroll 0 0 #E0DBD3;
+        color: #47381C;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 5px;
+        margin: 0;
+    }
+    .tag_list h5 a
+    {
+        color: #47381C;
+    }
+    .classify
+    {
+        margin: 10px 0;
+        padding: 4px 12px 8px;
+    }
+    .classify a
+    {
+        margin-right: 20px;
+        white-space: nowrap;
+    }
+</style>
+
+
+
+
+
+
+<div id="pop_win" style="display:none ;position: absolute; z-index: 10000; border: 1px solid rgb(220, 220, 220); top: 222.5px; left: 630px; opacity: 1; background: none 0px 0px repeat scroll rgb(255, 255, 255);">
+    
+</div>
+<div id="popup_mask"></div>
+<style>
+    #popup_mask
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 9999;
+        left: 0px;
+        top: 0px;
+        opacity: 0.3;
+        filter: alpha(opacity=30);
+        display: none;
+    }
+
+</style>
+
+
+
+
+
+<script type="text/javascript">
+    $(function(){        
+        
+        setTimeout(function(){
+            $(".comment_body:contains('回复')").each(function(index,item){
+                var u=$(this).text().split('：')[0].toString().replace("回复","")
+                var thisComment=$(this);
+                if(u)
+                {
+                    $.getJSON("https://passport.csdn.net/get/nick?callback=?", {users: u}, function(a) {
+                        if(a!=null&&a.data!=null&&a.data.length>0)
+                        {
+                            nick=a.data[0].n; 
+                            if(u!=nick)
+                            {
+                                thisComment.text(thisComment.text().replace(u,nick));  
+                            }
+                        }       
+                    });  
+                }
+            });         
+
+        },200);  
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },5000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },10000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },15000);
+        
+        setTimeout(function(){
+            $("a img[src='http://js.tongji.linezing.com/stats.gif']").parent().css({"position":"absolute","left":"50%"});
+        },300);
+    });
+
+    function loginbox(){
+        var $logpop=$("#pop_win");
+        $logpop.html('<iframe src="https://passport.csdn.net/account/loginbox?service=http://static.blog.csdn.net/callback.htm" frameborder="0" height="600" width="400" scrolling="no"></iframe>');
+
+        $('#popup_mask').css({
+            opacity: 0.5,
+            width: $( document ).width() + 'px',
+            height:  $( document ).height() + 'px'
+        });
+        $('#popup_mask').css("display","block");
+ 
+        $logpop.css( {
+            top: ($( window ).height() - $logpop.height())/ 2  + $( window 
+       ).scrollTop() + 'px',
+            left:($( window ).width() - $logpop.width())/ 2
+        } );
+ 
+        setTimeout( function () {
+            $logpop.show();
+            $logpop.css( {
+                opacity: 1
+            } );
+        }, 200 );
+ 
+        $('#popup_mask').unbind("click");
+        $('#popup_mask').bind("click", function(){
+            $('#popup_mask').hide();
+            var $clopop = $("#pop_win");
+            $("#common_ask_div_sc").css("display","none");
+            $clopop.css( {
+                opacity: 0
+            } );
+            setTimeout( function () {
+                $clopop.hide();
+            }, 350 );
+            return false;
+        });
+    }   
+
+    var articletitle='滴滴插件化方案 VirtualApk 源码解析';
+
+</script>
+<script src="http://c.csdnimg.cn/public/common/append_mark/appendMark.min.js?v=5.00.43" type="text/javascript"></script>
+<script type="text/javascript">
+    appendMark($('.recommend_list').children('a').find('dt'),$('.extension_other'))
+</script>
+
+
+
+
+
+
+
+
+
+                    <div class="clear">
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="side">
+                
+
+    <div class="side">
+
+<div id="panel_Profile" class="panel">
+<ul class="panel_head"><span>个人资料</span></ul>
+<ul class="panel_body profile">
+<div id="blog_userface">
+    <a href="http://my.csdn.net/lmj623565791" target="_blank">
+    <img src="http://avatar.csdn.net/F/F/5/1_lmj623565791.jpg" title="访问我的空间" style="max-width:90%"/>
+    </a>
+    <br />
+    <span><a href="http://my.csdn.net/lmj623565791" class="user_name" target="_blank">lmj623565791</a></span>
+</div>
+<div class="interact">
+
+    <a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+
+ <a href="javascript:void(0);" class="letter"  title="[发私信]" onclick="window.open('http://msg.csdn.net/letters/model?receiver=lmj623565791','_blank','height=350,width=700');_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_sixin'])"></a>  
+</div>
+<div id="blog_medal">
+                       <div class="ico_expert"  onclick="javascript:location='http://blog.csdn.net/experts/rule.html'" title="CSDN认证专家" style="cursor:pointer;width:60px;height:60px;background:url('http://c.csdnimg.cn/jifen/images/xunzhang/xunzhang/bokezhuanjiamiddle.png') no-repeat" ></div>
+                <div id="bms_box">
+                                            <a  target="_blank">
+                                                    <img src="http://c.csdnimg.cn/jifen/images/xunzhang/xunzhang/zhuanlandaren.png" onmouseover="m_over_m(this,2)" onmouseout="m_out_m()" alt="5" >
+                                            </a>
+                                            <a  target="_blank">
+                                                    <img src="http://c.csdnimg.cn/jifen/images/xunzhang/xunzhang/bokezhixing.png" onmouseover="m_over_m(this,6)" onmouseout="m_out_m()" alt="2" >
+                                            </a>
+               </div>
+
+</div>
+<ul id="blog_rank">
+    <li>访问：<span>18097464次</span></li>
+    <li>积分：<span>51541</span> </li>    
+    <li >等级： <span style="position:relative;display:inline-block;z-index:1" >
+            <img src="http://c.csdnimg.cn/jifen/images/xunzhang/jianzhang/blog9.png" alt="" style="vertical-align: middle;" id="leveImg">
+            <div id="smallTittle" style=" position: absolute;  left: -24px;  top: 25px;  text-align: center;  width: 101px;  height: 32px;  background-color: #fff;  line-height: 32px;  border: 2px #DDDDDD solid;  box-shadow: 0px 2px 2px rgba (0,0,0,0.1);  display: none;   z-index: 999;">
+            <div style="left: 42%;  top: -8px;  position: absolute;  width: 0;  height: 0;  border-left: 10px solid transparent;  border-right: 10px solid transparent;  border-bottom: 8px solid #EAEAEA;"></div>
+            积分：51541 </div>
+        </span>  </li>
+    <li>排名：<span>第66名</span></li>
+</ul>
+<ul id="blog_statistics">
+    <li>原创：<span>206篇</span></li>
+    <li>转载：<span>0篇</span></li>
+    <li>译文：<span>6篇</span></li>
+    <li>评论：<span>15689条</span></li>
+</ul>
+</ul>
+</div>
+
+
+                        
+ 
+
+<div id="custom_column_37972499" class="panel">
+<ul class="panel_head"><span>我的微信公众号</span></ul>
+<ul class="panel_body">
+<a href="https://github.com/hongyangAndroid/hongyangWeixinArticles">点击直达推送文章汇总</a><hr/>
+
+长期为您推荐优秀博文、开源项目、视频等，进入还有好玩的等着你，欢迎扫一扫。
+<img style="width:95%;" src="http://img.my.csdn.net/uploads/201501/30/1422600516_2905.jpg">
+</ul>
+</div>
+ 
+
+<div id="custom_column_36298017" class="panel">
+<ul class="panel_head"><span>联系方式</span></ul>
+<ul class="panel_body">
+<wb:follow-button uid="3165018720" type="red_1" width="67" height="24"><div class="WB_widget WB_follow_ex" style="width: 67px; height: 24px; overflow: hidden;"><div class="follow_btn_line" node-type="inner"><a class="follow_btn status_followed" node-type="followBtn" target="_blank" title="已关注" href="http://weibo.com/u/3165018720"><cite class="follow_btn_inner"><u class="WB_ico_logo"></u><cite class="follow_text">新动态</cite></cite></a></div></div></wb:follow-button>
+<hr>
+<a target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&amp;email=2_3p6O7t7uzi6puqqvW4tLY" style="text-decoration:none;"><img src="http://img.my.csdn.net/uploads/201505/17/1431844286_6921.png"></a>
+<hr>
+
+QQ群：
+<ul>
+<li style="color:red;font-size=22px;font-weight:bolder;display:none;">55032675</li>
+<li style="color:red;font-size=22px;font-weight:bolder;display:none;">423372824</li>
+<li style="color:red;font-size=22px;font-weight:bolder;">497438697</li>
+
+<li>请勿重复加群，Thx</li>
+</ul>
+</ul>
+</div> 
+<div id="panel_Category" class="panel">
+<ul class="panel_head"><span>文章分类</span></ul>
+<ul class="panel_body">    
+                 <li>
+                    <a href="/lmj623565791/article/category/3147547" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android 5.x】</a><span>(11)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2680597" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android 精彩案例】</a><span>(40)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2680605" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android 源码解析】</a><span>(31)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2680595" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android 自定义控件实战】</a><span>(29)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2680591" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android 自定义控件之起步】</a><span>(7)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2518197" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android 快速开发】</a><span>(12)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2680601" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android 原生开发游戏】</a><span>(3)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2132087" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Java 并发专题】</a><span>(15)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2210589" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【android 进阶之路】</a><span>(77)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2206597" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Java 设计模式】</a><span>(10)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2392939" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android 百度地图】</a><span>(4)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2335135" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【html5 css3精彩案例】</a><span>(14)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2188109" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android github 控件】</a><span>(10)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2170321" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android 基础】</a><span>(16)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2218967" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Javascript 】</a><span>(9)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/2386657" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【rabbitMQ 用法】</a><span>(5)</span>
+                </li>
+                 <li>
+                    <a href="/lmj623565791/article/category/6250701" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">【Android微知识点】</a><span>(4)</span>
+                </li>
+</ul>
+</div>
+ 
+
+<div id="custom_column_37398105" class="panel">
+<ul class="panel_head"><span>友情链接</span></ul>
+<ul class="panel_body">
+<ul>
+  <li style="padding:3px;"><a target="_blank" href="http://blog.csdn.net/guolin_blog">郭霖的博客</a></li>
+ <li style="padding:3px;"><a target="_blank" href="http://blog.csdn.net/xiaanming">夏安明的博客</a></li>
+ <li style="padding:3px;"><a target="_blank" href="http://blog.csdn.net/singwhatiwanna">任玉刚的博客</a></li>
+ <li style="padding:3px;"><a target="_blank" href="http://blog.csdn.net/qibin0506">亓斌的博客</a></li>
+<li style="padding:3px;"><a target="_blank" href="https://github.com/open-android/Android">Github开源项目的配套视频</a></li>
+ <li style="padding:3px;"><a target="_blank" href="http://www.konghao.org/index">敬佩的孔老师</a></li>
+ <li style="padding:3px;"><a target="_blank" href="http://blog.csdn.net/foruok">foruok的订阅号程序视界</a></li>
+<li style="padding:3px;"><a target="_blank" href="http://blog.csdn.net/wangyaninglm">OpenCV大神shiter</a></li>
+<li style="padding:3px;"><a target="_blank" href="https://bbs.ksyun.com/forum.php">金山云</a></li>
+<li style="padding:3px;"><a target="_blank" href="http://www.jikedaohang.com/">专为Android程序员的导航</a></li>
+ <li style="padding:3px;"><a target="_blank" href="http://www.jcodecraeer.com/plus/list.php?tid=16">泡在网上的日子</a></li>
+</ul>
+</ul>
+</div>
+<div id="panel_Category" class="panel">
+    <ul class="panel_head"><span>博客专栏</span></ul>
+    <ul class="panel_body" id="sp_column">
+    <table cellpadding="0" cellspacing="0"><tr>
+    <td style="padding:10px 10px 0 0;">
+    <a href="http://blog.csdn.net/column/details/html5css3.html" target="_blank"><img src="http://img.blog.csdn.net/20151123175920192" style="width:75px;height:75px;" /></a>
+    </td>
+    <td style="padding:10px 0; vertical-align:top;">
+    <a href="http://blog.csdn.net/column/details/html5css3.html" target="_blank">HTML5 &amp; CSS3 实战</a>
+    <p>文章：11篇</p>
+    <span>阅读：248514</span>
+    </td>
+    </tr></table>
+    <table cellpadding="0" cellspacing="0"><tr>
+    <td style="padding:10px 10px 0 0;">
+    <a href="http://blog.csdn.net/column/details/code-design.html" target="_blank"><img src="http://img.blog.csdn.net/20151123175823567" style="width:75px;height:75px;" /></a>
+    </td>
+    <td style="padding:10px 0; vertical-align:top;">
+    <a href="http://blog.csdn.net/column/details/code-design.html" target="_blank">设计模式融入生活</a>
+    <p>文章：10篇</p>
+    <span>阅读：142331</span>
+    </td>
+    </tr></table>
+    <table cellpadding="0" cellspacing="0"><tr>
+    <td style="padding:10px 10px 0 0;">
+    <a href="http://blog.csdn.net/column/details/android110.html" target="_blank"><img src="http://img.blog.csdn.net/20151123175818724" style="width:75px;height:75px;" /></a>
+    </td>
+    <td style="padding:10px 0; vertical-align:top;">
+    <a href="http://blog.csdn.net/column/details/android110.html" target="_blank">Android 精彩案例</a>
+    <p>文章：67篇</p>
+    <span>阅读：6755920</span>
+    </td>
+    </tr></table>
+    </ul>
+</div>
+<div id="hotarticls" class="panel csdn-tracking-statistics" data-pid="blog"  data-mod="popu_340">
+<ul class="panel_head">
+    <span>       
+阅读排行    </span>
+</ul>
+
+<ul class="panel_body itemlist">
+<li>
+<a href="/lmj623565791/article/details/48129405" title="Android Https相关完全解析 当OkHttp遇到Https">Android Https相关完全解析 当OkHttp遇到Https</a><span>(1620411)</span>
+</li>
+<li>
+<a href="/lmj623565791/article/details/45059587" title="Android RecyclerView 使用完全解析 体验艺术般的控件">Android RecyclerView 使用完全解析 体验艺术般的控件</a><span>(843514)</span>
+</li>
+<li>
+<a href="/lmj623565791/article/details/37970961" title="Android Fragment 真正的完全解析（上）">Android Fragment 真正的完全解析（上）</a><span>(786352)</span>
+</li>
+<li>
+<a href="/lmj623565791/article/details/47911083" title="Android OkHttp完全解析 是时候来了解OkHttp了">Android OkHttp完全解析 是时候来了解OkHttp了</a><span>(607955)</span>
+</li>
+<li>
+<a href="/lmj623565791/article/details/24252901" title="Android 自定义View (一)">Android 自定义View (一)</a><span>(384309)</span>
+</li>
+<li>
+<a href="/lmj623565791/article/details/38067475" title="Android 属性动画（Property Animation） 完全解析 （上）">Android 属性动画（Property Animation） 完全解析 （上）</a><span>(324047)</span>
+</li>
+<li>
+<a href="/lmj623565791/article/details/45460089" title="Android 屏幕适配方案">Android 屏幕适配方案</a><span>(316102)</span>
+</li>
+<li>
+<a href="/lmj623565791/article/details/37992017" title="Android Fragment 真正的完全解析（下）">Android Fragment 真正的完全解析（下）</a><span>(267325)</span>
+</li>
+<li>
+<a href="/lmj623565791/article/details/48649563" title="Android 沉浸式状态栏攻略 让你的状态栏变色吧">Android 沉浸式状态栏攻略 让你的状态栏变色吧</a><span>(260228)</span>
+</li>
+<li>
+<a href="/lmj623565791/article/details/38339817" title="Android 手把手教您自定义ViewGroup（一）">Android 手把手教您自定义ViewGroup（一）</a><span>(258168)</span>
+</li>
+</ul>
+</div>
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body" class="form_search">
+        <form id="frmSearch" class="form_search csdn-tracking-statistics" data-pid="blog"  target="_blank"  data-mod="popu_306">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字" /></span>
+        <input id="btnSubmit" type="button" value="搜索" title="search in blog" />
+        </form>
+    </ul>
+</div>
+
+<script type="text/javascript">
+
+   
+    $(function () {
+        $("#btnSubmit").unbind("click");
+        $("#btnSubmit").click(function () {           
+            search();
+        });
+
+        $("#frmSearch").submit(function () {           
+            search();
+            return false;
+        });
+
+        function search()
+        {
+            if ($("#inputSearch").val() == "") {               
+                alert("请录入搜索关键词！");                         
+                return false;
+            }
+            //var url = "http://so.csdn.net/so/search/s.do?q=" + encodeURIComponent($("#inputSearch").val()) + "&u=" + username + "&t=blog";           
+            var url = "https://www.baidu.com/s?wd=" + encodeURIComponent($("#inputSearch").val()) + "%20site%3Ablog.csdn.net"
+            var url = "/" + username + "?q=" + encodeURIComponent($("#inputSearch").val());
+            window.location.href = url;
+        }   
+    });
+</script>
+ 
+
+<div id="custom_column_40886443" class="panel">
+<ul class="panel_head"><span>统计</span></ul>
+<ul class="panel_body">
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?a2be8a9315245759d12f8ce94df7f7ac";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+</ul>
+</div>
+ 
+
+<div id="custom_column_41351807" class="panel">
+<ul class="panel_head"><span>微信公众号</span></ul>
+<ul class="panel_body">
+<div style="position:fixed;bottom: 0; right: 0px;z-index:1000;font-weight:bold;font-size:1.3em;background-color:#fff;font-family: 'Microsoft YaHei';border:1px solid #aaa;">
+  <div style="text-align:center;border-bottom:1px solid #aaa;padding:4px;">
+
+  <a href="http://wanandroid.com">~看不见我，看不见我~</a>
+  </div>
+<img width="180px" style="display:none" height="180px" src="http://img.my.csdn.net/uploads/201607/19/1468942304_6791.jpg">
+
+    </div>
+</ul>
+</div>
+    </div>
+    <div class="clear">
+    </div>
+
+                        <div class="csdn-tracking-statistics" data-pid="blog" data-view="true" data-mod="ad_popu_189" data-mtp="63" data-order="40" data-con="ad_content_1259" style="width: 250px; height: 250px;">
+                            <div id="nav_show_top_stop" style="width: 250px;height: 250px;z-index:1000">
+
+                                <div id="cpro_u3031286" style="text-align:center;">
+                                    <!-- 投放代码 -->
+                                    <script type="text/javascript" src="//cee1.iteye.com/bwocoflyv.js"></script>
+                                    
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+
+                            setTimeout(function () {
+                                var naviga_offsetTop = 0; function naviga_stay_top() {
+                                    var scrollTop = jQuery(document).scrollTop();
+                                    if (scrollTop > naviga_offsetTop) {
+                                        jQuery("#nav_show_top_stop").css({ "position": "fixed" });
+                                        jQuery("#nav_show_top_stop").css({ "top": "0px" });
+                                    } else { jQuery("#nav_show_top_stop").css({ "position": "fixed" }); jQuery("#nav_show_top_stop").css({ "top": naviga_offsetTop - scrollTop + "px" }); }
+                                }
+                                function onload_function() {
+                                    naviga_offsetTop = jQuery("#nav_show_top_stop").position().top;
+                                    jQuery(window).bind("scroll", naviga_stay_top); jQuery(window).bind("mousewheel", naviga_stay_top);
+                                    jQuery(document).bind("scroll", naviga_stay_top); jQuery(document).bind("mousewheel", naviga_stay_top);
+                                } jQuery(document).ready(onload_function);
+                            }, 200);
+
+                        </script>
+
+            </div>
+            <div class="clear">
+            </div>
+        </div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+    $(function () {
+        function __get_code_toolbar(snippet_id) {
+            return $("<span class='csdn-tracking-statistics' data-pid=\"blog\"  data-mod='popu_167'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "' target='_blank' title='在CODE上查看代码片'  style='text-indent:0;'><img src='https://code.csdn.net/assets/CODE_ico.png' width=12 height=12 alt='在CODE上查看代码片' style='position:relative;top:1px;left:2px;'/></a></span>"
+                + "<span class='csdn-tracking-statistics' data-pid=\"blog\"  data-mod='popu_170'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "/fork' target='_blank' title='派生到我的代码片' style='text-indent:0;'><img src='https://code.csdn.net/assets/ico_fork.svg' width=12 height=12 alt='派生到我的代码片' style='position:relative;top:2px;left:2px;'/></a></span>");
+        }
+        
+        $("[code_snippet_id]").each(function () {
+            __s_id = $(this).attr("code_snippet_id");
+            if (__s_id != null && __s_id != "" && __s_id != 0 && parseInt(__s_id) > 70020) {
+                __code_tool = __get_code_toolbar(__s_id);
+                $(this).prev().find(".tools").append(__code_tool);
+            }
+        });
+
+        $(".bar").show();
+    });
+</script>
+
+
+
+
+
+    </div>
+
+
+
+        <script type="text/javascript" src="http://static.blog.csdn.net/public/res/bower-libs/MathJax/MathJax.js?config=TeX-AMS_HTML"></script>
+
+    <script src="http://static.blog.csdn.net/scripts/csdn_blog_detail.min.js?v2018.01.26" type="text/javascript"></script>
+
+    <script type="text/javascript" src="http://csdnimg.cn/blog/csdn_public_blog_detail.min.js?20171208116"></script>
+
+    <script type="text/javascript" src="http://medal.blog.csdn.net/showblogmedal.ashx?blogid=1265041"></script>
+
+
+    <div id="a52b5334d" style="width: 1px; height: 1px; display: none;">
+        <script id="adJs52b5334"></script>
+        <script>document.getElementById("adJs52b5334").src = "http://ads.csdn.net/js/opt/52b5334.js?t=" + Math.random();</script>
+    </div>
+
+    <div class="pop_CA_cover" style="display:none"></div>
+    <div class="pop pop_CA" style="display:none">
+        <div class="CA_header">
+            收藏助手
+            <span class="cancel_icon" id="fapancle" onclick="$('.pop_CA').hide();$('.pop_CA_cover').hide();"></span>
+        </div>
+        <iframe src="" id="fa" frameborder="0" width="100%" height="360" scrolling="no"></iframe>
+    </div>
+
+
+        <script type="text/javascript">
+
+            $(function () {
+                var fromjs = $("#fromjs");
+                if (fromjs.length > 0) {
+                    $("#fromjs .markdown_views pre").addClass("prettyprint");
+                    prettyPrint();
+
+                    $('pre.prettyprint code').each(function () {
+                        var lines = $(this).text().split('\n').length;
+                        var $numbering = $('<ul/>').addClass('pre-numbering').hide();
+                        $(this).addClass('has-numbering').parent().append($numbering);
+                        for (i = 1; i <= lines; i++) {
+                            $numbering.append($('<li/>').text(i));
+                        };
+                        $numbering.fadeIn(1700);
+                    });
+
+                    $('.pre-numbering li').css("color", "#999");
+                }
+            });
+
+            $(".markdown_views a[target!='_blank']").attr("target", "_blank");
+
+            //$(".toc a[target='_blank']").attr("target", "");
+
+            setTimeout(function () {
+                $(".toc a[target='_blank']").attr("target", "");
+            }, 500);
+
+        </script>
+    <div style="display:none;">
+        <img src="" onerror='setTimeout(function(){if(top !== self){window["\x74\x6f\x70"]["\x6c\x6f\x63\x61\x74\x69\x6f\x6e"]["\x68\x72\x65\x66"] = window["\x6c\x6f\x63\x61\x74\x69\x6f\x6e"]["\x68\x72\x65\x66"];}            if(typeof(csdn)=="\x75\x6e\x64\x65\x66\x69\x6e\x65\x64"&&window["\x6c\x6f\x63\x61\x74\x69\x6f\x6e"]["\x68\x6f\x73\x74"]["\x69\x6e\x64\x65\x78\x4f\x66"]("\x63\x73\x64\x6e\x2e\x6e\x65\x74")<0&&window["\x6c\x6f\x63\x61\x74\x69\x6f\x6e"]["\x68\x6f\x73\x74"]["\x69\x6e\x64\x65\x78\x4f\x66"]("\x69\x74\x65\x79\x65\x2e\x63\x6f\x6d")<0){window["\x6c\x6f\x63\x61\x74\x69\x6f\x6e"]["\x68\x72\x65\x66"]="\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x63\x73\x64\x6e\x2e\x6e\x65\x74";}},3000);'>
+    </div>
+</body>
+</html>
